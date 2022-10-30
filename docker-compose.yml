@@ -1,0 +1,27 @@
+version: '4.10'
+services:
+  moveez_db:
+    image: mysql:8.0
+    volumes:
+      - ./storage/mysql:/var/lib/mysql
+      - ./init.sql:/data/application/init.sql
+    restart: always
+    command: --init-file /data/application/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports: 
+      - 3306:3306
+  moveez_server_node:
+    image: node:16.3.0
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/home/node/app
+    expose:
+      - "8081"
+    command: npm start
+    depends_on:
+      - moveez_db
+    ports: 
+      - 5000:5000

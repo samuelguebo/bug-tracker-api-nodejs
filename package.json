@@ -1,0 +1,28 @@
+{
+  "name": "moveez-backend-js",
+  "version": "1.0.0",
+  "description": "Backend written in JavaScript for a movie listing application",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "start": "node src/server.js"
+  },
+  "author": "Samuel Guebo",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.2",
+    "dotenv": "^16.0.3",
+    "express": "^4.16.2",
+    "first-run": "^3.0.0",
+    "jsonwebtoken": "^8.1.0",
+    "moment": "^2.19.2",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.25.3"
+  },
+  "devDependencies": {
+    "jest": "^29.2.2",
+    "nodemon": "^2.0.20"
+  }
+}
