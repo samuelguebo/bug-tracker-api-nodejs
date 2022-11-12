@@ -1,26 +1,23 @@
 import { Router } from 'express';
 import AuthMiddleware from '../utils/middleware-auth.js'
-import PostRoutes from './posts.js'
+import TaskRoutes from './tasks.js'
 import UserRoutes from './users.js'
-import CategoryRoutes from './categories.js'
+import ProjectRoutes from './projects.js'
 import AuthenticationRoutes from './authentication.js'
 
 const router  = Router();
 
 /**
  * Middlewares
-// Initial seed
-// import seedLoader from '../utils/middleware-seed.js';
-// app.use(seedLoader);
  */
 
 // Authentication
 router.use(AuthMiddleware);
 
 // Routes
-router.use('/posts', PostRoutes);
+router.use('/tasks', TaskRoutes);
 router.use('/users', UserRoutes);
-router.use('/categories', CategoryRoutes);
+router.use('/projects', ProjectRoutes);
 router.use('/authentication', AuthenticationRoutes);
 
 

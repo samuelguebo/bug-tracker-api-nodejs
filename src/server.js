@@ -3,9 +3,13 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import config from './utils/config.js';
 import routes from './controllers/index.js'
+import seedLoader from './utils/middleware-seed.js';
 
 const { json, urlencoded } = bodyParser;
 const app = express();
+
+// Initial seed
+app.use(seedLoader);
 
 // Middlewares
 app.use(json());

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 // Importing model
-import Category from '../models/category.js';
+import Project from '../models/project.js';
 
 const router  = Router();
 
@@ -9,9 +9,9 @@ const router  = Router();
 router.get('/', function(request, response) {
     
     // Finding 10 records
-    Category.findAll({limit: 10}).then(categories => {})
+    Project.findAll({limit: 10}).then(projects => {})
     .catch(err => {
-        response.status(404).send({error:"Could not find any category"})
+        response.status(404).send({error:"Could not find any project"})
     })
         
 
@@ -24,15 +24,15 @@ router.get('/:id', function(request, response){
     // Filtering
     if (!id.toString() || id.toString() === "") {
         response.status(500).send(
-            {error:"A category must have have an ID"}
+            {error:"A project must have have an ID"}
         );
     }else {
         // Model.update(conditions, doc, [options], [callback])
-        Category.findOne({_id: id}, 
+        Project.findOne({_id: id}, 
             function (err, raw) {
                 if (err) {
                     response.send(err.message);
-                    //response.status(500).send({error:"Could not update the category"});
+                    //response.status(500).send({error:"Could not update the project"});
                 } else {
                     response.send(raw);
                 }

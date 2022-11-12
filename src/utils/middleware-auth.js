@@ -7,7 +7,7 @@ const router  = Router();
 
 
 // Protecting /users path
-router.use('/categories', function (request, response, next){
+router.use('/projects', function (request, response, next){
     const token = request.body.token || request.query.token || request.headers['x-access-token'] || request.headers['token'];
      
     // decode token

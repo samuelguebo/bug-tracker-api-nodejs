@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import sequelize from './sequelizeHelper.js';
 
-const Category = sequelize.define('Category', {
+const Project = sequelize.define('Project', {
     title:DataTypes.STRING
   });
 
-export default Category
+export default Project

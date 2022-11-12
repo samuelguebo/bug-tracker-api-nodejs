@@ -36,11 +36,11 @@ router.delete('/:id', function(request, response){
 });
 
 // Get
+
 router.get('/', async function(request, response){
     // TODO
     const users = await User.findAll()
     response.status(200).send(users);
 });
-
 
 export default router;

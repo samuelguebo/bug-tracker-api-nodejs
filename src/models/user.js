@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import utils from "../utils/utils.js";
 import sequelize from './sequelizeHelper.js';
-import Post from "./post.js";
+import Task from "./task.js";
 
 const User = sequelize.define('User', {
     // Model attributes are defined here
@@ -17,6 +17,5 @@ const User = sequelize.define('User', {
         record.dataValues.password = hash
       },
   }});
-// Association
-User.hasOne(Post)
+
 export default User 

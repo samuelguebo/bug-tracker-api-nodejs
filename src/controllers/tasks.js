@@ -2,15 +2,18 @@ import { Router } from 'express';
 var router      = Router();
 
 // Importing models
-import Post from '../models/post.js';
+import Task from '../models/task.js';
 
 
 // List
-router.get('/', async function(request, response) {
+router.get('/', function(request, response) {
 
     // Finding 10 records
-    const posts = await Post.findAll({limit: 10})
-    response.send(posts); 
+    Task.findAll({limit: 10}).then(tasks => {
+        response.send(tasks); 
+    }).catch(err => {
+        response.status(500).send(err);
+    })
 
 });
 
@@ -24,11 +27,11 @@ router.get('/:id', function(request, response){
 router.post('/', async function(request, response) {
     
     // Inserting the row into the DB
-    Post.create(request.body).then(post => {
+    Task.create(request.body).then(post => {
         response.send(post)
     }).catch(err => {
         response.status(500).send(
-            {error: "Post could not be created"}
+            {error: "Task could not be created"}
         );
     })
     

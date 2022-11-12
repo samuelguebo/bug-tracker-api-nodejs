@@ -1,4 +1,4 @@
-# CRUD API with Node.js
+# BugTracker API with Node.js
 A restful API in Node.js with token-based authentication, TypeScript and Docker support.
 
 ## Set environment variables
@@ -9,18 +9,18 @@ Rename the `.env.example` file into `.env` and modify it according to your crede
 
 ## Features
 ### Initial data seed
-On first run the app is populated with some initial data: posts, users, categories
+On first run the app is populated with some initial data: tasks, users, projects
 
 ### Restful API
 An api with the following routes
-* `/posts`
-* `/categories`
+* `/tasks`
+* `/projects`
 * `/users`
 
-### Token authentication
+### JWT authentication
 An authentication system is included using the [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) library. 
-* `/authentication` generates a token if valid `username` and `password` are provided via Post
-* `/posts` endpoints are protected by the token authentication system
+* `/authentication` generates a token if valid `username` and `password` are provided via Task
+* `/tasks` endpoints are protected by the token authentication system
 
 ## Development
 ### Hot-reload in development mode
