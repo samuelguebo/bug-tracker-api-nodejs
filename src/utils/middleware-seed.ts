@@ -3,7 +3,7 @@
 import User from '../models/user.js';
 import Task from '../models/task.js';
 import Project from '../models/project.js';
-import utils from '../utils/utils.js';
+import utils from './utils.js';
 import firstRun from 'first-run';
 import { seedTasks, seedUsers } from './seed-data.js';
 
@@ -12,10 +12,7 @@ import { seedTasks, seedUsers } from './seed-data.js';
 const SeedLoader = function (request, response, next) {
         
     // Running db imports only once
-    if(firstRun({name: 'x'})) {
-        console.log("Entered firstRun");
-        oneTimeInsert();
-    }
+    oneTimeInsert();
     next();
 }
 
@@ -33,17 +30,19 @@ async function oneTimeInsert(){
             for(let row of seedUsers){
                 user = User.create(row)
             }
+        
+            // Create tasks
+            const post = await Task.findOne()
+            if(!post){
+                for(let post of seedTasks){
+                    // TODO: fix association bug
+                    Task.create({...post, UserId: user.id})
+                }
+            }
         }
          
         
-        // Create tasks
-        const post = await Task.findOne()
-        if(!post){
-            for(let post of seedTasks){
-                // TODO: fix association bug
-                Task.create({...post, UserId: user.id})
-            }
-        }
+
 
     } catch (error) {
         console.log(err)

@@ -13,15 +13,14 @@ const utils = {
         },
     currentDate: 
         function (){
-            let now = new moment();
             let date = moment().format('MMMM Do YYYY, h:mm:ss a');
             return date;
         },
-    hashPassword: function(plaintextPassword){
+    hashPassword: function(plaintextPassword: string){
         const salt = genSaltSync(10);
         return _hash(plaintextPassword, salt);
     },
-    compareHash: function(plaintextPassword, hash){
+    compareHash: function(plaintextPassword: string, hash: string){
         return compare(plaintextPassword, hash);
     }
 }

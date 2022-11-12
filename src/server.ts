@@ -4,6 +4,10 @@ import bodyParser from 'body-parser';
 import config from './utils/config.js';
 import routes from './controllers/index.js'
 import seedLoader from './utils/middleware-seed.js';
+import sourceMapSupport from 'source-map-support';
+
+// Typsescript source map support
+sourceMapSupport.install();
 
 const { json, urlencoded } = bodyParser;
 const app = express();
