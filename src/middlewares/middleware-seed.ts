@@ -1,7 +1,7 @@
 // Requirements
 
 import User from '../entity/User'
-import Task from '../entity/Task.js'
+import Task from '../entity/Task'
 import Project from '../entity/Project'
 import utils from '../utils/utils'
 import { seedProjects, seedTasks, seedUsers } from './seed-data'
@@ -52,7 +52,7 @@ async function oneTimeInsert() {
             // Create tasks
             for (let row of seedTasks) {
                 task = new Task()
-                task.title = row?.title || row?.original_title
+                task.title = row?.title || row?.original_title as string
                 task.author = user
                 task.members = [user]
                 task.content = row.content

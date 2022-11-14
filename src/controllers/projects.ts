@@ -10,7 +10,7 @@ const router = Router()
 router.get('/', function (request: Request, response: Response) {
 
     // Finding 10 records
-    AppDataSource.manager.find(Project).then(projects => {
+    AppDataSource.getRepository(Project).find().then(projects => {
         response.send(projects)
     })
         .catch(err => {

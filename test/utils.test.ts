@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
-import utils from '../utils/utils'
+import utils from '../src/utils/utils'
 describe('password hashing', () => {
     test('hash password', async () => {
         let plaintextPassword = "lorem"

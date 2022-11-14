@@ -1,4 +1,5 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import Comment from "./Comment"
 import Project from "./Project"
 import User from "./User"
 
@@ -15,8 +16,7 @@ export default class Task {
   @Column("text")
   content: string
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, (user) => user)
   author: User
 
   @ManyToMany(() => User)
