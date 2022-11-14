@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "Backend written in JavaScript for a bug tracking system.",
   "type": "commonjs",
-  "main": "server.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "tsc",
-    "run": "node dist/server.js",
+    "run": "ts-node -r dotenv/config src/server.ts",
     "build:watch": "tsc --watch",
-    "run:watch": "nodemon dist/server.js --watch dist",
-    "start": "npm-run-all --parallel build:watch run:watch"
+    "run:watch": "nodemon -r dotenv/config dist/server.js --watch dist",
+    "start": "npm-run-all --parallel build:watch run:watch",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "author": "Samuel Guebo",
   "license": "MIT",
@@ -23,8 +23,9 @@
     "jsonwebtoken": "^8.1.0",
     "moment": "^2.19.2",
     "mysql2": "^2.3.3",
-    "sequelize": "^6.25.3",
-    "source-map-support": "^0.5.21"
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.21",
+    "typeorm": "^0.3.10"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -37,6 +38,7 @@
     "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^29.0.3",
-    "typescript": "^4.8.4"
+    "ts-node": "10.7.0",
+    "typescript": "4.5.2"
   }
 }

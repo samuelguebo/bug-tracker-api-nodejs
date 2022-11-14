@@ -1,15 +1,15 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
+import { AppDataSource } from '../data-source';
+import Task from '../entity/Task';
 var router      = Router();
 
-// Importing models
-import Task from '../models/task.js';
 
 
 // List
-router.get('/', function(request, response) {
+router.get('/', function(request: Request, response: Response) {
 
     // Finding 10 records
-    Task.findAll({limit: 10}).then(tasks => {
+    AppDataSource.getRepository(Task).find({take: 10}).then(tasks => {
         response.send(tasks); 
     }).catch(err => {
         response.status(500).send(err);
@@ -18,17 +18,17 @@ router.get('/', function(request, response) {
 });
 
 // Read 
-router.get('/:id', function(request, response){
+router.get('/:id', function(request: Request, response: Response){
     // TODO
     response.status(404).send({error: "Undefined route"});
 });
 
 // Create
-router.post('/', async function(request, response) {
+router.post('/', async function(request: Request, response: Response) {
     
     // Inserting the row into the DB
-    Task.create(request.body).then(post => {
-        response.send(post)
+    AppDataSource.getRepository(Task).save(request.body).then(task => {
+        response.send(task)
     }).catch(err => {
         response.status(500).send(
             {error: "Task could not be created"}

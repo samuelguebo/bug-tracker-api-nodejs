@@ -1,8 +1,11 @@
+import { error } from 'console';
 import { Router, Request, Response } from 'express';
+import { AppDataSource } from '../data-source';
 const router      = Router();
 
 // Importing model
-import User from '../models/user.js';
+import User from '../entity/User';
+import utils from '../utils/utils';
 
 // Create
 router.post('/', function(request: Request, response: Response) {
@@ -14,9 +17,11 @@ router.post('/', function(request: Request, response: Response) {
     )}
    
     // Inserting the row into the DB, but hash password first
-    User.create(request.body).then(savedUser => {
-    response.send({id: savedUser.id});
-        
+    utils.hashPassword(request.body.password)
+    .then(async hash => {
+        request.body.password = hash
+        let user: User = await AppDataSource.getRepository(User).save(request.body)
+        response.send(user);
     }).catch(err => {
         response.status(500).send({error: `Could not create the user ${err}`});
     })
@@ -37,10 +42,14 @@ router.delete('/:id', function(request: Request, response: Response){
 
 // Get
 
-router.get('/', async function(request: Request, response: Response){
-    // TODO
-    const users = await User.findAll()
-    response.status(200).send(users);
+router.get('/', function(request: Request, response: Response){
+    
+    AppDataSource.getRepository(User).find({take: 5}).then(users => {
+        response.status(200).send(users);
+    }).catch(error => {
+        console.log(error)
+    })
+    
 });
 
 export default router;

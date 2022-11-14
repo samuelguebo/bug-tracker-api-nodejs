@@ -1,41 +1,25 @@
 // Applying authentication to specific endpoints
-import config from './config.js';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import jsonwebtoken from 'jsonwebtoken';
 const { verify } = jsonwebtoken;
 const router  = Router();
 
 
-// Protecting /users path
-router.use('/projects', function (request, response, next){
-    const token = request.body.token || request.query.token || request.headers['x-access-token'] || request.headers['token'];
-     
-    // decode token
-    if(token) {
-        
-        // verify token and check expiry date
-        verify(token, config.supersecret, function(err, decoded) {
-            if(err){
-                return response.json({
-                    success: false,
-                    message: 'Invalid token'
-                })
-            }else{
-                
-                // save decoded variable for other requests
-                request.decoded = decoded;
-                next();
-            }
-            
-        } )
+// Protecting /projects path
+router.use('/projects', function (request: Request, response: Response, next){
+    const token =
+    request.body.token || request.query.token || request.headers["x-access-token"];
 
-    }else {
-        // no token, deny
-       response.status(403).send({
-           success: false,
-           message: 'No token provided'
-       }) 
+    if (!token) {
+        return response.status(403).send("A token is required for authentication");
     }
+    try {
+        const decoded = verify(token, process.env.AUTH_SECRET);
+        request["user"] = decoded;
+    } catch (err) {
+        return response.status(401).send("Invalid Token");
+    }
+    return next();
 }); 
 
 export default router;

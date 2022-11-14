@@ -1,15 +1,18 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
+import { AppDataSource } from '../data-source';
 
 // Importing model
-import Project from '../models/project.js';
+import Project from '../entity/Project';
 
 const router  = Router();
 
 // List
-router.get('/', function(request, response) {
+router.get('/', function(request: Request, response: Response) {
     
     // Finding 10 records
-    Project.findAll({limit: 10}).then(projects => {})
+    AppDataSource.manager.find(Project).then(projects => {
+        response.send(projects)
+    })
     .catch(err => {
         response.status(404).send({error:"Could not find any project"})
     })
@@ -27,17 +30,8 @@ router.get('/:id', function(request, response){
             {error:"A project must have have an ID"}
         );
     }else {
-        // Model.update(conditions, doc, [options], [callback])
-        Project.findOne({_id: id}, 
-            function (err, raw) {
-                if (err) {
-                    response.send(err.message);
-                    //response.status(500).send({error:"Could not update the project"});
-                } else {
-                    response.send(raw);
-                }
-            }
-        );
+        // TODO: Find user by id
+        response.send(200)
     }
 });
 

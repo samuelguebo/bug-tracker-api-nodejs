@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import AuthMiddleware from '../utils/middleware-auth.js'
-import TaskRoutes from './tasks.js'
-import UserRoutes from './users.js'
-import ProjectRoutes from './projects.js'
-import AuthenticationRoutes from './authentication.js'
+import AuthMiddleware from '../utils/middleware-auth'
+import TaskRoutes from './tasks'
+import UserRoutes from './users'
+import ProjectRoutes from './projects'
+import AuthenticationRoutes from './authentication'
 
 const router  = Router();
 
