@@ -24,4 +24,5 @@ const utils = {
         return compare(plaintextPassword, hash)
     }
 }
+
 export default utils

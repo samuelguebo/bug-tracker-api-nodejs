@@ -2,10 +2,10 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 
 @Entity()
 export default class Project {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'varchar', length: 80 })
+  @Column({ type: 'varchar', nullable: false, length: 80 })
   title: string
 
   @CreateDateColumn()

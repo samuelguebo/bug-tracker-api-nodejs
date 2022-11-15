@@ -1,8 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm"
+import { BaseEntity, Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
 
+@Unique(["email"])
 @Entity()
 export default class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number
+
+  @Column({ nullable: false, })
   email: string
 
   @Column({ nullable: true })

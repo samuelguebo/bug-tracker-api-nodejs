@@ -1,5 +1,5 @@
 {
-  "editor.formatOnPaste": true,
+  "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
   "eslint.validate": [ "javascript", "javascriptreact", "html", "typescriptreact" ],
 }

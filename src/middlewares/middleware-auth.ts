@@ -5,8 +5,8 @@ const { verify } = jsonwebtoken
 const router = Router()
 
 
-// Protecting /projects path
-router.use('/projects', function (request: Request, response: Response, next) {
+// Protecting /tasks path
+router.use('/tasks', function (request: Request, response: Response, next) {
     const token =
         request.body.token || request.query.token || request.headers["x-access-token"]
 

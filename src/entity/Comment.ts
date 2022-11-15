@@ -3,7 +3,7 @@ import User from "./User"
 
 @Entity()
 export default class Comment {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id: number
 
     @Column("text")
