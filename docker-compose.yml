@@ -1,0 +1,39 @@
+version: '4.10'
+services:
+  bugtracker_mysql:
+    image: mysql:8.0
+    volumes:
+      - ./storage/mysql:/var/lib/mysql
+      - ./init.sql:/data/application/init.sql
+    restart: always
+    command: --init-file /data/application/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+  bugtracker_nodejs:
+    image: node:16.3.0
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/home/node/app
+    expose:
+      - 8081
+    command: npm start
+    depends_on:
+      - bugtracker_mysql
+    ports:
+      - 5000:5000
+  bugtracker_phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    links:
+      - bugtracker_mysql
+    environment:
+      PMA_HOST: bugtracker_mysql
+      PMA_PASSWORD: root
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - 4000:80
