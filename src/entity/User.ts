@@ -6,7 +6,7 @@ export default class User {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ nullable: false, })
+  @Column({ nullable: false })
   email: string
 
   @Column({ nullable: true })

@@ -1,41 +1,56 @@
+import { body, validationResult } from 'express-validator'
 import { Request, Response, Router } from 'express'
+import { In } from 'typeorm'
 import { AppDataSource } from '../data-source'
-
-// Importing model
 import Project from '../entity/Project'
+import User from '../entity/User'
 
 const router = Router()
 const projectRepository = AppDataSource.getRepository(Project)
+const userRepository = AppDataSource.getRepository(User)
 
 // Create
-router.post('/', async function (request: Request, response: Response) {
-    if (!request.body.title) {
-        return response.status(403).send({ error: 'No title address provided.' })
-    }
+router.post('/',
+    body('title').isLength({ min: 5 }),
+    body('members').optional(),
+    async (request: Request, response: Response) => {
 
-    // Inserting the row into the DB
-    projectRepository.save(request.body)
-        .then(project => {
+        // Handle missing fields
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+
+        let payload = {}
+        let members: User[] = []
+
+        // Prepare payload for DB insertion
+        payload = { title: request.body.title }
+        if (request.body.members !== undefined) {
+            members = await userRepository.find({ where: { id: In(request.body.members) } })
+            payload = { title: request.body.title, members: members }
+        }
+
+        // Persist and return ID
+        projectRepository.save(payload).then(project => {
             response.send({ id: project.id })
         }).catch(err => {
-            response.status(500).send({ error: `Could not create the project, ${err}` })
+            response.status(500).send({ error: `Could not create the user ${err}` })
         })
 
-})
+    })
 // List
-router.get('/', function (request: Request, response: Response) {
+router.get('/', (request: Request, response: Response) => {
 
     projectRepository.find({ take: 10 })
-        .then(projects => {
-            response.send(projects)
-        })
+        .then(projects => response.send(projects))
         .catch(err => {
             response.status(404).send({ error: "Could not find any projects." })
         })
 })
 
 // Read 
-router.get('/:id', function (request, response) {
+router.get('/:id', (request: Request, response: Response) => {
     var id = request.params.id
 
     // Filtering
@@ -51,13 +66,13 @@ router.get('/:id', function (request, response) {
 
 
 // Update 
-router.put('/:id', function (request, response) {
+router.put('/:id', (equest: Request, response: Response) => {
     // TODO
     response.status(404).send({ error: "Undefined route" })
 })
 
 // Delete
-router.delete('/:id', function (request, response) {
+router.delete('/:id', (equest: Request, response: Response) => {
     // TODO
     response.status(404).send({ error: "Undefined route" })
 })

@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express'
+import { body, validationResult } from 'express-validator'
 import utils from '../utils/utils'
 import User from '../entity/User'
 import { AppDataSource } from '../data-source'
@@ -7,23 +8,28 @@ const router = Router()
 const userRepository = AppDataSource.getRepository(User)
 
 // Create
-router.post('/', function (request: Request, response: Response) {
-    if (!request.body.email) {
-        return response.status(403).send({ error: 'No email address provided.' })
-    }
+router.post('/',
+    body('email').isEmail(),
+    body('password').isLength({ min: 6 }),
+    function (request: Request, response: Response,
+    ) {
+        // Handle missing fields
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
 
-    // Inserting the row into the DB, but hash password first
-    utils.hashPassword(request.body.password)
-        .then(async hash => {
+        // Inserting the row into the DB, but hash password first
+        utils.hashPassword(request.body.password)
+            .then(async hash => {
+                request.body.password = hash
+                let user: User = await userRepository.save(request.body)
+                response.send({ id: user.id })
+            }).catch(err => {
+                response.status(500).send({ error: `Could not create the user ${err}` })
+            })
 
-            let user: User = await userRepository.save(request.body)
-            request.body.password = hash
-            response.send({ id: user.id })
-        }).catch(err => {
-            response.status(500).send({ error: `Could not create the user ${err}` })
-        })
-
-})
+    })
 
 // Get All
 router.get('/', function (request: Request, response: Response) {
@@ -36,16 +42,49 @@ router.get('/', function (request: Request, response: Response) {
 
 })
 
-// Update 
-router.put('/:id', function (request: Request, response: Response) {
-    // TODO
-    response.status(404).send({ error: "Undefined route" })
+// Get single user 
+router.put('/:id',
+    body('email').optional().isEmail(),
+    body('password').optional().isLength({ min: 6 }),
+    function (request: Request, response: Response) {
+        // Handle missing fields
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+
+        userRepository.findOne({
+            where: { id: Number(request.params.id) },
+            select: ['id', 'email', 'firstName', 'lastName']
+        })
+            .then(async user => {
+                // Handle password change
+                if (request.body.password !== undefined) {
+                    let hash = await utils.hashPassword(request.body.password)
+                    request.body.password = hash
+                }
+                // Update record
+                userRepository.update(user.id, request.body)
+                response.status(200).send({ id: user.id })
+            }).catch(error => response.status(400).send({ error: error }))
+
+    })
+
+// Get a single User 
+router.get('/:id', function (request: Request, response: Response) {
+    userRepository.findOne({ where: { id: Number(request.params.id) } })
+        .then(async user => {
+            response.status(200).send({ id: user.id, email: user.email, })
+        }).catch(error => response.status(400).send({ error: error }))
 })
 
-// Delete
+// Delete a single user
 router.delete('/:id', function (request: Request, response: Response) {
-    // TODO
-    response.status(404).send({ error: "Undefined route" })
+    userRepository.findOne({ where: { id: Number(request.params.id) } })
+        .then(async user => {
+            userRepository.delete({ id: Number(user.id) })
+            response.send(200)
+        }).catch(error => response.send(400))
 })
 
 export default router

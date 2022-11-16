@@ -1,9 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { AppDataSource } from '../data-source'
 import Task from '../entity/Task'
-var router = Router()
-
-
+const router = Router()
 
 // List
 router.get('/', function (request: Request, response: Response) {

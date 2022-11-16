@@ -19,9 +19,9 @@ export default class Task {
   @ManyToOne(() => User, (user) => user)
   author: User
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { cascade: true })
   @JoinTable()
-  members: User[]
+  subscribers: User[]
 
   @Column({
     type: 'enum',

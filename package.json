@@ -4,7 +4,7 @@
   "description": "Backend written in JavaScript for a bug tracking system.",
   "type": "commonjs",
   "scripts": {
-    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --setupFiles dotenv/config --watch --detectOpenHandles",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --setupFiles dotenv/config --watch --detectOpenHandles",
     "build:watch": "tsc --watch",
     "run:watch": "nodemon -r dotenv/config dist/server.js --watch dist",
     "start": "npm-run-all --parallel build:watch run:watch",
@@ -19,6 +19,7 @@
     "body-parser": "^1.18.2",
     "dotenv": "^16.0.3",
     "express": "^4.16.2",
+    "express-validator": "^6.14.2",
     "first-run": "^3.0.0",
     "jsonwebtoken": "^8.1.0",
     "moment": "^2.19.2",
