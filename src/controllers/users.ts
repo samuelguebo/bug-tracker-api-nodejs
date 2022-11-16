@@ -64,8 +64,10 @@ router.put('/:id',
                     request.body.password = hash
                 }
                 // Update record
-                userRepository.update(user.id, request.body)
-                response.status(200).send({ id: user.id })
+                user = await userRepository.preload(user)
+                user = { ...user, ...request.body }
+                user = await userRepository.save(user)
+                response.status(200).send(user)
             }).catch(error => response.status(400).send({ error: error }))
 
     })
@@ -83,8 +85,8 @@ router.delete('/:id', function (request: Request, response: Response) {
     userRepository.findOne({ where: { id: Number(request.params.id) } })
         .then(async user => {
             userRepository.delete({ id: Number(user.id) })
-            response.send(200)
-        }).catch(error => response.send(400))
+            response.sendStatus(200)
+        }).catch(error => response.sendStatus(400))
 })
 
 export default router

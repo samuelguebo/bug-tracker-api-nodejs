@@ -49,31 +49,60 @@ router.get('/', (request: Request, response: Response) => {
         })
 })
 
-// Read 
-router.get('/:id', (request: Request, response: Response) => {
-    var id = request.params.id
-
-    // Filtering
-    if (!id.toString() || id.toString() === "") {
-        response.status(500).send(
-            { error: "A project must have have an ID" }
-        )
-    } else {
-        // TODO: Find user by id
-        response.send(200)
-    }
+// Get a single User 
+router.get('/:id', function (request: Request, response: Response) {
+    projectRepository.findOne({
+        where: { id: Number(request.params.id) },
+        select: ['id', 'title', 'members']
+    })
+        .then(project => {
+            response.status(200).send(project)
+        }).catch(error => response.status(400).send({ error: error }))
 })
 
 
 // Update 
-router.put('/:id', (equest: Request, response: Response) => {
-    // TODO
-    response.status(404).send({ error: "Undefined route" })
-})
+router.put('/:id',
+    body('title').isLength({ min: 5 }),
+    body('members').optional(),
+    async (request: Request, response: Response) => {
 
-// Delete
-router.delete('/:id', (equest: Request, response: Response) => {
-    // TODO
-    response.status(404).send({ error: "Undefined route" })
+        // Handle missing fields
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+
+        let payload = {}
+        let members: User[] = []
+
+        // Prepare payload for DB insertion
+        payload = { title: request.body.title }
+        if (request.body.members !== undefined) {
+            members = await userRepository.find({ where: { id: In(request.body.members) } })
+        }
+
+        // Persist and return ID
+        projectRepository.findOne({
+            where: { id: Number(request.params.id) }
+        }).then(async project => {
+
+            project = await projectRepository.preload(project)
+            project = { ...project, ...request.body, members: members }
+            project = await projectRepository.save(project)
+            response.send(project)
+        }).catch(err => {
+            response.status(500).send({ error: `${err}` })
+        })
+
+    })
+
+// Delete a single Project
+router.delete('/:id', function (request: Request, response: Response) {
+    projectRepository.findOne({ where: { id: Number(request.params.id) } })
+        .then(async project => {
+            projectRepository.delete({ id: Number(project.id) })
+            response.sendStatus(200)
+        }).catch(error => response.sendStatus(400))
 })
 export default router

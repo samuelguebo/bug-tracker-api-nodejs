@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
+import { BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
+import Project from "./Project"
 
 @Unique(["email"])
 @Entity()

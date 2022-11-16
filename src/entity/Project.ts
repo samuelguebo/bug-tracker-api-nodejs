@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import User from "./User"
 
 @Entity()
@@ -15,7 +15,7 @@ export default class Project {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @ManyToMany(() => User, { cascade: true })
-  @JoinTable()
+  @ManyToMany(() => User)
+  @JoinTable({ name: 'project_members' })
   members: User[]
 }
