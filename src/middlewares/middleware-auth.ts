@@ -5,8 +5,11 @@ const { verify } = jsonwebtoken
 const router = Router()
 
 
-// Protecting /tasks path
-router.use('/tasks', function (request: Request, response: Response, next) {
+// Protecting path
+router.use('/', function (request: Request, response: Response, next) {
+    /**
+     * TODO: Apply RBAC for data modifying operations 
+
     const token =
         request.body.token || request.query.token || request.headers["x-access-token"]
 
@@ -19,6 +22,7 @@ router.use('/tasks', function (request: Request, response: Response, next) {
     } catch (err) {
         return response.status(401).send("Invalid Token")
     }
+    */
     return next()
 })
 

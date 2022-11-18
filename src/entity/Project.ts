@@ -1,10 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import BaseEntity from "./BaseEntity"
 import User from "./User"
 
 @Entity()
-export default class Project {
-  @PrimaryGeneratedColumn()
-  id: number
+export default class Project extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: false, length: 80 })
   title: string

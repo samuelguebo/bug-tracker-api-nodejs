@@ -1,10 +1,10 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import BaseEntity from "./BaseEntity"
+import Task from "./Task"
 import User from "./User"
 
 @Entity()
-export default class Comment {
-    @PrimaryGeneratedColumn()
-    id: number
+export default class Comment extends BaseEntity {
 
     @Column("text")
     content: string
@@ -12,8 +12,11 @@ export default class Comment {
     @CreateDateColumn()
     createdAt: Date
 
-    @ManyToOne(() => User, (user: User) => user)
+    @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
     author: User
+
+    @ManyToOne(() => Task, { nullable: false, onDelete: 'CASCADE' })
+    task: Task
 
     @UpdateDateColumn()
     updatedAt: Date

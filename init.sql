@@ -1,1 +1,4 @@
-CREATE DATABASE IF NOT EXISTS bugtracker_db;
+CREATE DATABASE
+IF NOT EXISTS bugtracker_db;
+CREATE DATABASE
+IF NOT EXISTS bugtracker_test_db;

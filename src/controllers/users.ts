@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express'
-import { body, validationResult } from 'express-validator'
+import { body, param, validationResult } from 'express-validator'
 import utils from '../utils/utils'
 import User from '../entity/User'
-import { AppDataSource } from '../data-source'
+import { AppDataSource } from '../utils/dbHelper'
 
 const router = Router()
 const userRepository = AppDataSource.getRepository(User)
@@ -26,10 +26,11 @@ router.post('/',
                 let user: User = await userRepository.save(request.body)
                 response.send({ id: user.id })
             }).catch(err => {
-                response.status(500).send({ error: `Could not create the user ${err}` })
+                response.status(500).send({ error: `${err}` })
             })
 
-    })
+    }
+)
 
 // Get All
 router.get('/', function (request: Request, response: Response) {
@@ -44,6 +45,7 @@ router.get('/', function (request: Request, response: Response) {
 
 // Get single user 
 router.put('/:id',
+    param('id').isNumeric(),
     body('email').optional().isEmail(),
     body('password').optional().isLength({ min: 6 }),
     function (request: Request, response: Response) {
@@ -70,23 +72,29 @@ router.put('/:id',
                 response.status(200).send(user)
             }).catch(error => response.status(400).send({ error: error }))
 
-    })
+    }
+)
 
 // Get a single User 
-router.get('/:id', function (request: Request, response: Response) {
-    userRepository.findOne({ where: { id: Number(request.params.id) } })
-        .then(async user => {
-            response.status(200).send({ id: user.id, email: user.email, })
-        }).catch(error => response.status(400).send({ error: error }))
-})
+router.get('/:id',
+    param('id').isNumeric(),
+    function (request: Request, response: Response) {
+        userRepository.findOne({ where: { id: Number(request.params.id) } })
+            .then(async user => {
+                response.status(200).send({ id: user.id, email: user.email, })
+            }).catch(error => response.status(400).send({ error: error }))
+    })
 
 // Delete a single user
-router.delete('/:id', function (request: Request, response: Response) {
-    userRepository.findOne({ where: { id: Number(request.params.id) } })
-        .then(async user => {
-            userRepository.delete({ id: Number(user.id) })
-            response.sendStatus(200)
-        }).catch(error => response.sendStatus(400))
-})
+router.delete('/:id',
+    param('id').isNumeric(),
+    function (request: Request, response: Response) {
+        userRepository.findOne({ where: { id: Number(request.params.id) } })
+            .then(async user => {
+                userRepository.delete({ id: Number(user.id) })
+                response.sendStatus(200)
+            }).catch(error => response.sendStatus(400))
+    }
+)
 
 export default router

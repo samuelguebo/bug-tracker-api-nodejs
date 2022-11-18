@@ -2,7 +2,7 @@ import { Router } from 'express'
 import User from '../entity/User'
 import jsonwebtoken from 'jsonwebtoken'
 import utils from '../utils/utils'
-import { AppDataSource } from '../data-source'
+import { AppDataSource } from '../utils/dbHelper'
 
 const { sign } = jsonwebtoken
 const router = Router()

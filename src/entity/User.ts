@@ -1,13 +1,12 @@
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
-import Project from "./Project"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm"
+import BaseEntity from "./BaseEntity"
+import Comment from "./Comment"
+import Task from "./Task"
 
-@Unique(["email"])
 @Entity()
-export default class User {
-  @PrimaryGeneratedColumn()
-  id: number
+export default class User extends BaseEntity {
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email: string
 
   @Column({ nullable: true })
@@ -16,6 +15,13 @@ export default class User {
   @Column({ nullable: true })
   lastName: string
 
-  @Column()
+  @Column({ select: false })
   password: string
+
+  @OneToMany(() => Task, task => task.author)
+  tasks: Task[]
+
+  @OneToMany(() => Comment, comment => comment.author)
+  comments: Comment[]
+
 }

@@ -3,3 +3,4 @@ storage/
 .env
 ormconfig.env
 dist/
+.DS_Store

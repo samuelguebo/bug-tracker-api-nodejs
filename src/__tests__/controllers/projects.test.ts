@@ -2,17 +2,19 @@ import { describe, expect, test } from '@jest/globals'
 import request from 'supertest'
 import { In } from 'typeorm'
 import app from '../../app'
-import { AppDataSource } from '../../data-source'
 import Project from '../../entity/Project'
 import User from '../../entity/User'
-import { initializeDatabase } from '../../utils/dbHelper'
+import { AppDataSource } from '../../utils/dbHelper'
+import { TestDataSource } from '../../utils/testHelper'
+
 
 const projectRepository = AppDataSource.getRepository(Project)
 const userRepository = AppDataSource.getRepository(User)
 
 beforeAll(async () => {
-    await initializeDatabase()
+    await AppDataSource.initialize()
 })
+
 
 describe('GET /projects', () => {
     it('should display list of projects in JSON format', async () => {
@@ -38,7 +40,7 @@ describe('GET /projects', () => {
 })
 
 describe('POST /projects', () => {
-    it('should allow the creation of project and return an ID', async () => {
+    it('should allow the creation of project and return entity', async () => {
         const response = await request(app)
             .post("/projects")
             .send({ title: "Compliance audit" })
@@ -98,10 +100,10 @@ describe('PUT /projects/:id', () => {
         expect(response.body.id).toBeGreaterThan(0)
 
         let updatedProject = await projectRepository.findOne({ where: { id: project.id } })
-        expect(updatedProject.title).toBe('Org-wide Holidays')
+        expect(updatedProject?.title).toBe('Org-wide Holidays')
 
         // Delete recently created User
-        await projectRepository.delete({ id: updatedProject.id })
+        await projectRepository.delete({ id: updatedProject?.id })
 
     })
 

@@ -6,6 +6,7 @@ import AuthMiddleware from './middlewares/middleware-auth'
 import TaskRoutes from './controllers/tasks'
 import UserRoutes from './controllers/users'
 import ProjectRoutes from './controllers/projects'
+import CommentsRoutes from './controllers/comments'
 import AuthenticationRoutes from './controllers/authentication'
 
 const app = express()
@@ -20,9 +21,10 @@ app.use(urlencoded({ extended: false }))
 app.use(AuthMiddleware)
 
 // Routes
+app.use('/authentication', AuthenticationRoutes)
+app.use('/comments', CommentsRoutes)
+app.use('/projects', ProjectRoutes)
 app.use('/tasks', TaskRoutes)
 app.use('/users', UserRoutes)
-app.use('/projects', ProjectRoutes)
-app.use('/authentication', AuthenticationRoutes)
 
 export default app
