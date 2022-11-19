@@ -5,16 +5,19 @@ import app from '../../app'
 import Project from '../../entity/Project'
 import User from '../../entity/User'
 import { AppDataSource } from '../../utils/dbHelper'
-import { TestDataSource } from '../../utils/testHelper'
-
 
 const projectRepository = AppDataSource.getRepository(Project)
 const userRepository = AppDataSource.getRepository(User)
 
-beforeAll(async () => {
-    await AppDataSource.initialize()
+beforeEach(async () => {
+    if (!AppDataSource.isInitialized)
+        await AppDataSource.initialize()
 })
 
+afterEach(async () => {
+    await AppDataSource.dropDatabase()
+    await AppDataSource.destroy()
+})
 
 describe('GET /projects', () => {
     it('should display list of projects in JSON format', async () => {
@@ -32,10 +35,6 @@ describe('GET /projects', () => {
             .get(`/projects/${project.id}`)
         expect(response.statusCode).toBe(200)
         expect(response.body.title).toBe(project.title)
-
-        // Delete recently created User
-        await projectRepository.delete({ id: project.id })
-
     })
 })
 
@@ -48,10 +47,6 @@ describe('POST /projects', () => {
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
         expect(response.body.id).toBeGreaterThan(0)
-
-        // Delete recently created User
-        await projectRepository.delete({ id: response.body.id })
-
     })
 
     it('should attach users to projects as members', async () => {
@@ -69,10 +64,6 @@ describe('POST /projects', () => {
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
         expect(response.body.id).toBeGreaterThan(0)
-
-        // Delete recently created Project and Users
-        await projectRepository.delete({ id: response.body.id })
-        await userRepository.delete({ id: In(userIds) })
 
     })
 
@@ -102,9 +93,6 @@ describe('PUT /projects/:id', () => {
         let updatedProject = await projectRepository.findOne({ where: { id: project.id } })
         expect(updatedProject?.title).toBe('Org-wide Holidays')
 
-        // Delete recently created User
-        await projectRepository.delete({ id: updatedProject?.id })
-
     })
 
     it('should attach users to Project on update', async () => {
@@ -131,10 +119,6 @@ describe('PUT /projects/:id', () => {
         expect(response.headers['content-type']).toContain('json')
         expect(response.body.members).toHaveLength(userIds.length)
 
-        // Delete recently created Project and Users
-        await projectRepository.delete({ id: response.body.id })
-        await userRepository.delete({ id: In(userIds) })
-
     })
 })
 
@@ -148,5 +132,4 @@ describe('DELETE /projects/:id', () => {
         expect(response.statusCode).toBe(200)
 
     })
-
 })

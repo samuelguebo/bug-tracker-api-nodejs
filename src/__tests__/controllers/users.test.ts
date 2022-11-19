@@ -1,14 +1,19 @@
 import { describe, expect, test } from '@jest/globals'
 import request from 'supertest'
-import { DataSource, Repository } from 'typeorm'
 import app from '../../app'
 import User from '../../entity/User'
-import { AppDataSource, initializeDatabase } from '../../utils/dbHelper'
+import { AppDataSource } from '../../utils/dbHelper'
 
 const userRepository = AppDataSource.getRepository(User)
 
 beforeEach(async () => {
-    await initializeDatabase()
+    if (!AppDataSource.isInitialized)
+        await AppDataSource.initialize()
+})
+
+afterEach(async () => {
+    await AppDataSource.dropDatabase()
+    await AppDataSource.destroy()
 })
 
 describe('GET /users', () => {
@@ -31,9 +36,6 @@ describe('GET /users', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.email).toBe(user.email)
 
-        // Delete recently created User
-        await userRepository.delete(user.id)
-
     })
 
 })
@@ -46,9 +48,6 @@ describe('POST /users', () => {
             .send({ email: "cecile@doe.com", password: "cecile@doe.com" })
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
-
-        // Delete recently created User
-        await userRepository.delete({ id: response.body.id })
 
     })
 
@@ -76,9 +75,6 @@ describe('PUT /users/:id', () => {
 
         let updatedUser = await userRepository.findOne({ where: { id: user.id } })
         expect(updatedUser.firstName).toBe('Cecile')
-
-        // Delete recently created User
-        await userRepository.delete({ id: updatedUser.id })
 
     })
 

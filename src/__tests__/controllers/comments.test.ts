@@ -31,18 +31,15 @@ const mockEntities = async () => {
     return { project, user, task, comment }
 }
 
-const deleteMockEntities = async ({ project, user, task, comment }) => {
-    await commentRepository.delete(comment.id)
-    await taskRepository.delete(task.id)
-    await projectRepository.delete(project.id)
-    await userRepository.delete(user.id)
-
-}
-
-beforeAll(async () => {
-    await AppDataSource.initialize()
+beforeEach(async () => {
+    if (!AppDataSource.isInitialized)
+        await AppDataSource.initialize()
 })
 
+afterEach(async () => {
+    await AppDataSource.dropDatabase()
+    await AppDataSource.destroy()
+})
 
 describe('GET /comments', () => {
     it('should display list of comments in JSON format', async () => {
@@ -60,9 +57,6 @@ describe('GET /comments', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.content).toBe(comment.content)
 
-
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task, comment })
     })
 })
 
@@ -84,8 +78,6 @@ describe('POST /comments', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.content).toBe(comment.content)
 
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task, comment })
     })
 
     it('should not allow comment creation when task ID is missing', async () => {
@@ -98,8 +90,6 @@ describe('POST /comments', () => {
                 content: comment.content
             })
 
-        expect(response.statusCode).toBe(400)
-        await deleteMockEntities({ project, user, task, comment })
     })
 })
 
@@ -128,9 +118,6 @@ describe('PUT /comments/:id', () => {
                     where: { id: comment.id }
                 })
         expect(updatedComment.content).toBe('An update is usually a good thing!')
-
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task, comment })
     })
 
 })
@@ -143,8 +130,6 @@ describe('DELETE /comments/:id', () => {
         const response = await request(app).delete(`/comments/${comment.id}`)
         expect(response.statusCode).toBe(200)
 
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task, comment })
     })
 
 })

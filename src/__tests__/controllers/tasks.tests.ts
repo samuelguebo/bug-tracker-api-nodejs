@@ -23,18 +23,15 @@ const mockEntities = async () => {
     return { project, user, task }
 }
 
-const deleteMockEntities = async ({ project, user, task }) => {
-    await userRepository.delete(user.id)
-    await projectRepository.delete(project.id)
-    await taskRepository.delete(task.id)
-
-}
-
-beforeAll(async () => {
-    await AppDataSource.initialize()
+beforeEach(async () => {
+    if (!AppDataSource.isInitialized)
+        await AppDataSource.initialize()
 })
 
-
+afterEach(async () => {
+    await AppDataSource.dropDatabase()
+    await AppDataSource.destroy()
+})
 
 describe('GET /tasks', () => {
     it('should display list of tasks in JSON format', async () => {
@@ -45,23 +42,19 @@ describe('GET /tasks', () => {
 
     it('should display details of single task', async () => {
 
-        const { project, user, task } = await mockEntities()
-
+        const { task } = await mockEntities()
         const response = await request(app)
             .get(`/tasks/${task.id}`)
         expect(response.statusCode).toBe(200)
         expect(response.body.title).toBe(task.title)
 
-
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task })
     })
 })
 
 describe('POST /tasks', () => {
     it('should allow the creation of task and return entity', async () => {
         // Get mocks
-        let { project, user, task } = await mockEntities()
+        let { user, task } = await mockEntities()
 
         // Make HTTP request
         const response = await request(app)
@@ -74,22 +67,16 @@ describe('POST /tasks', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.priority).toBe('low')
 
-        // Delete recently created data
-        await taskRepository.delete(response.body.id)
-        await deleteMockEntities({ project, user, task })
     })
 
     it('should not allow task creation when author ID is missing', async () => {
-        const { project, user, task } = await mockEntities()
-
+        const { task } = await mockEntities()
         const response = await request(app)
             .post('/tasks')
             .send({ title: task.title })
 
         expect(response.statusCode).toBe(400)
 
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task })
     })
 })
 
@@ -98,7 +85,7 @@ describe('PUT /tasks/:id', () => {
     it('should allow the update of task and return an ID', async () => {
 
         // Get mocks
-        const { task, project, user } = await mockEntities()
+        const { task, user } = await mockEntities()
 
         // Make HTTP query
         const response = await request(app)
@@ -115,8 +102,6 @@ describe('PUT /tasks/:id', () => {
             .findOne({ where: { id: task.id } })
         expect(updatedTask.title).toBe('An update is usually a good thing!')
 
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task })
     })
 
 })
@@ -124,14 +109,10 @@ describe('PUT /tasks/:id', () => {
 
 describe('DELETE /tasks/:id', () => {
     it('should allow the deletion of task and return 200', async () => {
-        const { project, user, task } = await mockEntities()
-
-
+        const { task } = await mockEntities()
         const response = await request(app).delete(`/tasks/${task.id}`)
         expect(response.statusCode).toBe(200)
 
-        // Delete recently created data
-        await deleteMockEntities({ project, user, task })
     })
 
 })
