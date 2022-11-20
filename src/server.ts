@@ -1,5 +1,5 @@
 import app from "./app"
-import { initializeDatabase } from "./utils/dbHelper";
+import { initializeDatabase } from "./services/dbService";
 
 // Initiate Database connection
 (async () => {

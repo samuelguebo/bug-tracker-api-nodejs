@@ -2,12 +2,12 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import sourceMapSupport from 'source-map-support'
-import AuthMiddleware from './middlewares/middleware-auth'
 import TaskRoutes from './controllers/tasks'
 import UserRoutes from './controllers/users'
 import ProjectRoutes from './controllers/projects'
 import CommentsRoutes from './controllers/comments'
 import AuthenticationRoutes from './controllers/authentication'
+import authenticateJWT from './services/authService'
 
 const app = express()
 const { json, urlencoded } = bodyParser
@@ -17,14 +17,11 @@ sourceMapSupport.install()
 app.use(json())
 app.use(urlencoded({ extended: false }))
 
-// Middlewares
-app.use(AuthMiddleware)
-
 // Routes
-app.use('/authentication', AuthenticationRoutes)
-app.use('/comments', CommentsRoutes)
-app.use('/projects', ProjectRoutes)
-app.use('/tasks', TaskRoutes)
-app.use('/users', UserRoutes)
+app.use('/', AuthenticationRoutes)
+app.use('/comments', authenticateJWT, CommentsRoutes)
+app.use('/projects', authenticateJWT, ProjectRoutes)
+app.use('/tasks', authenticateJWT, TaskRoutes)
+app.use('/users', authenticateJWT, UserRoutes)
 
 export default app

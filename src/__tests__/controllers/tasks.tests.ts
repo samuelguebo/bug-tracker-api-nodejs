@@ -4,8 +4,8 @@ import app from '../../app'
 import Project from '../../entity/Project'
 import Task from '../../entity/Task'
 import User from '../../entity/User'
-import { AppDataSource, initializeDatabase } from '../../utils/dbHelper'
-import { initializeTestDatabase, TestDataSource } from '../../utils/testHelper'
+import { generateJWT } from '../../services/authService'
+import { AppDataSource, initializeDatabase } from '../../services/dbService'
 
 const userRepository = AppDataSource.getRepository(User)
 const projectRepository = AppDataSource.getRepository(Project)
@@ -15,12 +15,14 @@ const mockEntities = async () => {
     let project: Project
     let user: User
     let task: Task
+    let token: string
 
     project = await projectRepository.save({ ...project, title: 'December holidays' })
     user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com' })
     task = await taskRepository.save({ ...task, title: 'Send gift cards to employees', author: user })
+    token = generateJWT()
 
-    return { project, user, task }
+    return { project, user, task, token }
 }
 
 beforeEach(async () => {
@@ -35,16 +37,20 @@ afterEach(async () => {
 
 describe('GET /tasks', () => {
     it('should display list of tasks in JSON format', async () => {
-        const response = await request(app).get('/tasks')
+        const { token } = await mockEntities()
+        const response = await request(app)
+            .get('/tasks')
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
     })
 
     it('should display details of single task', async () => {
 
-        const { task } = await mockEntities()
+        const { task, token } = await mockEntities()
         const response = await request(app)
             .get(`/tasks/${task.id}`)
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
         expect(response.body.title).toBe(task.title)
 
@@ -54,11 +60,12 @@ describe('GET /tasks', () => {
 describe('POST /tasks', () => {
     it('should allow the creation of task and return entity', async () => {
         // Get mocks
-        let { user, task } = await mockEntities()
+        let { user, task, token } = await mockEntities()
 
         // Make HTTP request
         const response = await request(app)
             .post('/tasks')
+            .set({ "x-access-token": token })
             .send({
                 author: user.id,
                 title: task.title
@@ -70,9 +77,10 @@ describe('POST /tasks', () => {
     })
 
     it('should not allow task creation when author ID is missing', async () => {
-        const { task } = await mockEntities()
+        const { task, token } = await mockEntities()
         const response = await request(app)
             .post('/tasks')
+            .set({ "x-access-token": token })
             .send({ title: task.title })
 
         expect(response.statusCode).toBe(400)
@@ -80,16 +88,16 @@ describe('POST /tasks', () => {
     })
 })
 
-
 describe('PUT /tasks/:id', () => {
     it('should allow the update of task and return an ID', async () => {
 
         // Get mocks
-        const { task, user } = await mockEntities()
+        const { task, user, token } = await mockEntities()
 
         // Make HTTP query
         const response = await request(app)
             .put(`/tasks/${task.id}`)
+            .set({ "x-access-token": token })
             .send({
                 author: user.id,
                 title: 'An update is usually a good thing!'
@@ -106,11 +114,12 @@ describe('PUT /tasks/:id', () => {
 
 })
 
-
 describe('DELETE /tasks/:id', () => {
     it('should allow the deletion of task and return 200', async () => {
-        const { task } = await mockEntities()
-        const response = await request(app).delete(`/tasks/${task.id}`)
+        const { task, token } = await mockEntities()
+        const response = await request(app)
+            .delete(`/tasks/${task.id}`)
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
 
     })

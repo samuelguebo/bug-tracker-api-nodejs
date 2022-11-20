@@ -4,9 +4,7 @@ A restful API built with Node.js, MySQL, JWT authentication, TypeScript, and Doc
 ## Local development
 
 ### Install Docker
-This project uses [Docker](https://docs.docker.com/engine/install/) to set up a local
-environment. [Download](https://docs.docker.com/engine/install/) and install Docker and
-   [docker-compose](https://docs.docker.com/compose/)
+This project uses [Docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/).
 
 ### Set environment variables
 Rename the `.env.example` file into `.env` and modify it according to your credentials and settings.
@@ -20,7 +18,9 @@ A web server will be setup, available at http://localhost:5000. Change to TypeSc
 
 ### Stop Docker container
 To stop, run `docker-compose stop` or hit CTRL-C on the terminal your docker-compose
-is running in. After that, to start with code changes, you'll want to `docker-compose down`
+is running in.
+
+After that, to start with code changes, you'll want to `docker-compose down`
 to clean up.
 
 ### Logs
@@ -29,20 +29,24 @@ Logs of containerized servers are captured and available in [Docker logs](https:
 
 ## Features
 ### Initial data seed
-On first run the app is populated with some initial data: tasks, users, projects
+On first run the app is populated with some initial data: tasks, users, projects, comments.
 
 ### Restful API
 An api with the following routes
+* `/signup`
+`/login`
 * `/tasks`
 * `/projects`
 * `/users`
+* `/comments`
 
 ### JWT authentication
 An authentication system is included using the [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) library. 
-* `/authentication` generates a token if valid `username` and `password` are provided via Task
-* `/tasks` endpoints are protected by the token authentication system
+* `/signup` helps create an account 
+* `/login` generates a token if valid `username` and `password` are provided
+* All the other routes are protected by the token authentication system
 
 ## Unit testing
-Tests are grouped under the folder `src/test` and are powered by [Jest](https://jestjs.io/docs/getting-started). Run all test suites with the following command: 
+Tests are grouped under the folder `src/__tests__` and are powered by [Jest](https://jestjs.io/docs/getting-started). Run all test suites with the following command: 
 
 `npm test`

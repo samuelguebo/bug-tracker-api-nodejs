@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express'
 import { body, param, validationResult } from 'express-validator'
-import { AppDataSource } from '../utils/dbHelper'
+import { AppDataSource } from '../services/dbService'
 import Comment from '../entity/Comment'
 
 const router = Router()

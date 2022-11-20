@@ -4,7 +4,8 @@ import { In } from 'typeorm'
 import app from '../../app'
 import Project from '../../entity/Project'
 import User from '../../entity/User'
-import { AppDataSource } from '../../utils/dbHelper'
+import { generateJWT } from '../../services/authService'
+import { AppDataSource } from '../../services/dbService'
 
 const projectRepository = AppDataSource.getRepository(Project)
 const userRepository = AppDataSource.getRepository(User)
@@ -21,7 +22,9 @@ afterEach(async () => {
 
 describe('GET /projects', () => {
     it('should display list of projects in JSON format', async () => {
-        const response = await request(app).get('/projects')
+        const response = await request(app)
+            .get('/projects')
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
     })
@@ -33,6 +36,7 @@ describe('GET /projects', () => {
 
         const response = await request(app)
             .get(`/projects/${project.id}`)
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
         expect(response.body.title).toBe(project.title)
     })
@@ -42,6 +46,7 @@ describe('POST /projects', () => {
     it('should allow the creation of project and return entity', async () => {
         const response = await request(app)
             .post("/projects")
+            .set({ "x-access-token": generateJWT() })
             .send({ title: "Compliance audit" })
 
         expect(response.statusCode).toBe(200)
@@ -59,7 +64,10 @@ describe('POST /projects', () => {
 
         userIds = users.map(user => user.id)
         const payLoad = { title: 'Compliance audit', members: userIds }
-        const response = await request(app).post("/projects").send(payLoad)
+        const response = await request(app)
+            .post("/projects")
+            .set({ "x-access-token": generateJWT() })
+            .send(payLoad)
 
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
@@ -71,6 +79,7 @@ describe('POST /projects', () => {
 
         const response = await request(app)
             .post("/projects")
+            .set({ "x-access-token": generateJWT() })
             .send({})
 
         expect(response.statusCode).toBe(400)
@@ -86,6 +95,7 @@ describe('PUT /projects/:id', () => {
 
         const response = await request(app)
             .put(`/projects/${project.id}`)
+            .set({ "x-access-token": generateJWT() })
             .send({ title: 'Org-wide Holidays' })
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
@@ -112,7 +122,10 @@ describe('PUT /projects/:id', () => {
 
         // Update Project
         const payLoad = { title: 'Compliance audit', members: userIds }
-        const response = await request(app).put(`/projects/${project.id}`).send(payLoad)
+        const response = await request(app)
+            .put(`/projects/${project.id}`)
+            .set({ "x-access-token": generateJWT() })
+            .send(payLoad)
 
         // Check API response and value of updated Project
         expect(response.statusCode).toBe(200)
@@ -128,7 +141,9 @@ describe('DELETE /projects/:id', () => {
             { title: "International Women Day" }
         )
 
-        const response = await request(app).delete(`/projects/${project.id}`)
+        const response = await request(app)
+            .delete(`/projects/${project.id}`)
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
 
     })

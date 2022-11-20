@@ -1,7 +1,7 @@
 import { body, param, validationResult } from 'express-validator'
 import { Request, Response, Router } from 'express'
 import { In } from 'typeorm'
-import { AppDataSource } from '../utils/dbHelper'
+import { AppDataSource } from '../services/dbService'
 import Project from '../entity/Project'
 import User from '../entity/User'
 

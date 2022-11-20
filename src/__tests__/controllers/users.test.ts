@@ -2,7 +2,8 @@ import { describe, expect, test } from '@jest/globals'
 import request from 'supertest'
 import app from '../../app'
 import User from '../../entity/User'
-import { AppDataSource } from '../../utils/dbHelper'
+import { generateJWT } from '../../services/authService'
+import { AppDataSource } from '../../services/dbService'
 
 const userRepository = AppDataSource.getRepository(User)
 
@@ -19,7 +20,9 @@ afterEach(async () => {
 describe('GET /users', () => {
 
     it('should display list of users in JSON format', async () => {
-        const response = await request(app).get('/users')
+        const response = await request(app)
+            .get('/users')
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
     })
@@ -33,32 +36,12 @@ describe('GET /users', () => {
 
         const response = await request(app)
             .get(`/users/${user.id}`)
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
         expect(response.body.email).toBe(user.email)
 
     })
 
-})
-
-
-describe('POST /users', () => {
-    it('should allow the creation of user and return an ID', async () => {
-        const response = await request(app)
-            .post("/users")
-            .send({ email: "cecile@doe.com", password: "cecile@doe.com" })
-        expect(response.statusCode).toBe(200)
-        expect(response.body.id).toBeGreaterThan(0)
-
-    })
-
-    it('should not allow user creation when email is missing', async () => {
-
-        const response = await request(app)
-            .post("/users")
-            .send({ firstName: 'Marie Cecile', password: "cecile@doe.com" })
-        expect(response.statusCode).toBe(400)
-
-    })
 })
 
 describe('PUT /users/:id', () => {
@@ -69,6 +52,7 @@ describe('PUT /users/:id', () => {
 
         const response = await request(app)
             .put(`/users/${user.id}`)
+            .set({ "x-access-token": generateJWT() })
             .send({ firstName: 'Cecile', password: "celeste@doe.com" })
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
@@ -86,7 +70,9 @@ describe('DELETE /users/:id', () => {
             { email: "cecile@doe.com", password: "cecile@doe.com" }
         )
 
-        const response = await request(app).delete(`/users/${user.id}`)
+        const response = await request(app)
+            .delete(`/users/${user.id}`)
+            .set({ "x-access-token": generateJWT() })
         expect(response.statusCode).toBe(200)
 
     })

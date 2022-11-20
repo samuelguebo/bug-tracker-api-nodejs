@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { AppDataSource } from '../utils/dbHelper'
+import { AppDataSource } from '../services/dbService'
 import { body, param, validationResult } from 'express-validator'
 import Task from '../entity/Task'
 import User from '../entity/User'

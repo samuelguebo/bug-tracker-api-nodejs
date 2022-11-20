@@ -1,36 +1,11 @@
 import { Router, Request, Response } from 'express'
 import { body, param, validationResult } from 'express-validator'
-import utils from '../utils/utils'
+import utils from '../services/passwordService'
 import User from '../entity/User'
-import { AppDataSource } from '../utils/dbHelper'
+import { AppDataSource } from '../services/dbService'
 
 const router = Router()
 const userRepository = AppDataSource.getRepository(User)
-
-// Create
-router.post('/',
-    body('email').isEmail(),
-    body('password').isLength({ min: 6 }),
-    function (request: Request, response: Response,
-    ) {
-        // Handle missing fields
-        const errors = validationResult(request);
-        if (!errors.isEmpty()) {
-            return response.status(400).json({ errors: errors.array() });
-        }
-
-        // Inserting the row into the DB, but hash password first
-        utils.hashPassword(request.body.password)
-            .then(async hash => {
-                request.body.password = hash
-                let user: User = await userRepository.save(request.body)
-                response.send({ id: user.id })
-            }).catch(err => {
-                response.status(500).send({ error: `${err}` })
-            })
-
-    }
-)
 
 // Get All
 router.get('/', function (request: Request, response: Response) {
