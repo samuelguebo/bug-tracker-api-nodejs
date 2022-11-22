@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals'
 import request from 'supertest'
-import { In } from 'typeorm'
 import app from '../../app'
 import Project from '../../entity/Project'
+import Task from '../../entity/Task'
 import User from '../../entity/User'
 import { generateJWT } from '../../services/authService'
 import { AppDataSource } from '../../services/dbService'
@@ -20,23 +20,49 @@ afterEach(async () => {
     await AppDataSource.destroy()
 })
 
+const mockEntities = async () => {
+    let project: Project
+    let user: User
+    let task: Task
+    let token: string
+    let users: User[] = []
+    let userIds: number[] = []
+
+    users.push(await userRepository.save({
+        email: 'one@doe.com', password: 'one@doe.com'
+    }))
+    users.push(await userRepository.save({
+        email: 'two@doe.com', password: 'two@doe.com'
+    }))
+
+    userIds = users.map(user => user.id)
+    project = await projectRepository.save({
+        ...project, title: 'December holidays'
+    })
+    user = await userRepository.save({
+        ...user, email: 'anna@doe.com', password: 'anna@doe.com', role: "admin"
+    })
+    token = generateJWT(user)
+
+    return { project, user, task, userIds, token }
+}
+
 describe('GET /projects', () => {
     it('should display list of projects in JSON format', async () => {
+        const { token } = await mockEntities()
         const response = await request(app)
             .get('/projects')
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
     })
 
     it('should display details of single Project', async () => {
-        let project: Project = await projectRepository.save(
-            { title: "Quaterly reviews" }
-        )
+        const { project, userIds, token } = await mockEntities()
 
         const response = await request(app)
             .get(`/projects/${project.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
         expect(response.body.title).toBe(project.title)
     })
@@ -44,9 +70,10 @@ describe('GET /projects', () => {
 
 describe('POST /projects', () => {
     it('should allow the creation of project and return entity', async () => {
+        const { token } = await mockEntities()
         const response = await request(app)
             .post("/projects")
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
             .send({ title: "Compliance audit" })
 
         expect(response.statusCode).toBe(200)
@@ -56,17 +83,11 @@ describe('POST /projects', () => {
 
     it('should attach users to projects as members', async () => {
 
-        let users: User[] = []
-        let userIds: number[] = []
-
-        users.push(await userRepository.save({ email: 'one@doe.com', password: 'one@doe.com' }))
-        users.push(await userRepository.save({ email: 'two@doe.com', password: 'two@doe.com' }))
-
-        userIds = users.map(user => user.id)
+        const { userIds, token } = await mockEntities()
         const payLoad = { title: 'Compliance audit', members: userIds }
         const response = await request(app)
             .post("/projects")
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
             .send(payLoad)
 
         expect(response.statusCode).toBe(200)
@@ -76,10 +97,10 @@ describe('POST /projects', () => {
     })
 
     it('should not allow project creation when title is missing', async () => {
-
+        const { token } = await mockEntities()
         const response = await request(app)
             .post("/projects")
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
             .send({})
 
         expect(response.statusCode).toBe(400)
@@ -89,42 +110,32 @@ describe('POST /projects', () => {
 
 describe('PUT /projects/:id', () => {
     it('should update Project and return an ID', async () => {
-        let project: Project = await projectRepository.save(
-            { title: "International Women Day" }
-        )
+        const { project, token } = await mockEntities()
 
         const response = await request(app)
             .put(`/projects/${project.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
             .send({ title: 'Org-wide Holidays' })
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
 
-        let updatedProject = await projectRepository.findOne({ where: { id: project.id } })
+        let updatedProject = await projectRepository.findOne(
+            {
+                where: { id: project.id }
+            })
         expect(updatedProject?.title).toBe('Org-wide Holidays')
 
     })
 
     it('should attach users to Project on update', async () => {
 
-        let users: User[] = []
-        let userIds: number[] = []
-
-        // create Project with no members
-        let project: Project = await projectRepository.save(
-            { title: "International Women Day" }
-        )
-
-        // Prepare new members
-        users.push(await userRepository.save({ email: 'one@doe.com', password: 'one@doe.com' }))
-        users.push(await userRepository.save({ email: 'two@doe.com', password: 'two@doe.com' }))
-        userIds = users.map(user => user.id)
+        const { project, userIds, token } = await mockEntities()
 
         // Update Project
         const payLoad = { title: 'Compliance audit', members: userIds }
         const response = await request(app)
             .put(`/projects/${project.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
             .send(payLoad)
 
         // Check API response and value of updated Project
@@ -137,13 +148,11 @@ describe('PUT /projects/:id', () => {
 
 describe('DELETE /projects/:id', () => {
     it('should delete Project and return 200', async () => {
-        let project: Project = await projectRepository.save(
-            { title: "International Women Day" }
-        )
+        const { project, token } = await mockEntities()
 
         const response = await request(app)
             .delete(`/projects/${project.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": token })
         expect(response.statusCode).toBe(200)
 
     })

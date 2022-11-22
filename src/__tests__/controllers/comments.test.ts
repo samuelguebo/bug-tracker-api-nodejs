@@ -1,6 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
 import request from 'supertest'
-import { EntityMetadata } from 'typeorm'
 import app from '../../app'
 import Comment from '../../entity/Comment'
 import Project from '../../entity/Project'
@@ -22,7 +21,7 @@ const mockEntities = async () => {
     let task: Task
 
     project = await projectRepository.save({ ...project, title: 'December holidays' })
-    user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com' })
+    user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com', role: "admin" })
     task = await taskRepository.save({ ...task, title: 'Send gift cards to employees', author: user })
 
     comment = await commentRepository.save({
@@ -44,9 +43,10 @@ afterEach(async () => {
 
 describe('GET /comments', () => {
     it('should display list of comments in JSON format', async () => {
+        const { user } = await mockEntities()
         const response = await request(app)
             .get('/comments')
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
     })
@@ -57,7 +57,7 @@ describe('GET /comments', () => {
 
         const response = await request(app)
             .get(`/comments/${comment.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
         expect(response.statusCode).toBe(200)
         expect(response.body.content).toBe(comment.content)
 
@@ -73,7 +73,7 @@ describe('POST /comments', () => {
         // Make HTTP request
         const response = await request(app)
             .post('/comments')
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
             .send({
                 task: comment.task.id,
                 author: comment.author.id,
@@ -90,7 +90,7 @@ describe('POST /comments', () => {
 
         const response = await request(app)
             .post('/comments')
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
             .send({
                 author: comment.author.id,
                 content: comment.content
@@ -109,7 +109,7 @@ describe('PUT /comments/:id', () => {
         // Make HTTP query
         const response = await request(app)
             .put(`/comments/${comment.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
             .send({
                 task: comment.task.id,
                 author: comment.author.id,
@@ -133,10 +133,9 @@ describe('DELETE /comments/:id', () => {
     it('should allow the deletion of comment and return 200', async () => {
         const { project, user, task, comment } = await mockEntities()
 
-
         const response = await request(app)
             .delete(`/comments/${comment.id}`)
-            .set({ "x-access-token": generateJWT() })
+            .set({ "x-access-token": generateJWT(user) })
         expect(response.statusCode).toBe(200)
 
     })

@@ -13,7 +13,6 @@ const userRepository: Repository<User> = AppDataSource.getRepository(User)
 // Authentication
 router.post('/login', async function (request, response) {
     try {
-
         const user: User = await userRepository.findOne(
             {
                 where: { email: request.body.email },
@@ -25,12 +24,12 @@ router.post('/login', async function (request, response) {
         }
 
         // Check the password now
-        // console.log(`comparing ${request.body.password} and ${user.password}`)
         const isSame = await utils.compareHash(request.body.password, user.password)
-        const token = generateJWT()
+        const token = generateJWT(user)
         if (isSame === false) {
-            return response.status(403).send({ message: "Authentication failed, password do not match" })
-
+            return response.status(403).send({
+                message: "Authentication failed, password do not match"
+            })
 
         }
         // Otherwise return token

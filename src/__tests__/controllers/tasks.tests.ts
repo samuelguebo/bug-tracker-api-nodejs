@@ -18,9 +18,9 @@ const mockEntities = async () => {
     let token: string
 
     project = await projectRepository.save({ ...project, title: 'December holidays' })
-    user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com' })
+    user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com', role: "admin" })
     task = await taskRepository.save({ ...task, title: 'Send gift cards to employees', author: user })
-    token = generateJWT()
+    token = generateJWT(user)
 
     return { project, user, task, token }
 }

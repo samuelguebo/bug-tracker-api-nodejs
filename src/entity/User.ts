@@ -15,6 +15,9 @@ export default class User extends BaseEntity {
   @Column({ nullable: true })
   lastName: string
 
+  @Column({ default: 'member', })
+  role: string
+
   @Column({ select: false })
   password: string
 

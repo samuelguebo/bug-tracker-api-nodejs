@@ -5,7 +5,7 @@ import Task from "../entity/Task"
 import User from "../entity/User"
 import { DataSource } from "typeorm"
 
-export const AppDataSource = process.env.NODE_ENV == 'production'
+export const AppDataSource = process.env.NODE_ENV === 'production'
     ? new DataSource({
         type: process.env.TYPEORM_TYPE as any,
         host: process.env.TYPEORM_HOST,
