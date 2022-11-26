@@ -10,12 +10,15 @@ import AuthenticationRoutes from './controllers/authentication'
 import authenticateJWT from './services/authService'
 
 const app = express()
+const cors = require('cors');
 const { json, urlencoded } = bodyParser
 
-// Typescript and JSON Parsing support 
+// Typescript, CORS, and JSON Parsing support 
 sourceMapSupport.install()
+app.use(cors());
 app.use(json())
 app.use(urlencoded({ extended: false }))
+
 
 // Routes
 app.use('/', AuthenticationRoutes)
