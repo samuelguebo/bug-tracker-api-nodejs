@@ -35,7 +35,7 @@ const authenticateJWT = async (request: Request, response: Response, next: NextF
 }
 
 export const generateJWT = (user: User) => sign({ userId: user.id }, process.env.AUTH_SECRET, {
-    expiresIn: 24 * 60  // expires in 24 hours
+    expiresIn: 24 * 60 * 60  // expires in 24 hours
 })
 
 export const verifyUserAuthorization = (user: User, request: Request): Boolean => {

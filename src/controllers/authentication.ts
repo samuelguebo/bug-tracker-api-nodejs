@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express'
 import User from '../entity/User'
-import jsonwebtoken from 'jsonwebtoken'
 import utils from '../services/passwordService'
 import { AppDataSource } from '../services/dbService'
 import { body, validationResult } from 'express-validator'
@@ -16,11 +15,11 @@ router.post('/login', async function (request, response) {
         const user: User = await userRepository.findOne(
             {
                 where: { email: request.body.email },
-                select: ['password']
+                select: ['id', 'password', 'role', 'email', 'firstName']
             })
 
         if (!user) {
-            return response.status(404).send({ message: "Authentication failed, no User found" })
+            return response.status(404).send({ message: msgNoUserFound })
         }
 
         // Check the password now
@@ -28,13 +27,17 @@ router.post('/login', async function (request, response) {
         const token = generateJWT(user)
         if (isSame === false) {
             return response.status(403).send({
-                message: "Authentication failed, password do not match"
+                message: msgWrongPassword
             })
-
         }
-        // Otherwise return token
+        // Otherwise return payload
         response.send({
-            token: token
+            email: user.email,
+            token: token,
+            role: user.role,
+            firstName: user.firstName,
+            message: msgLoginSuccess,
+            id: user.id
         })
     } catch (error) {
         response.status(500).send(error)
@@ -51,7 +54,7 @@ router.post('/signup',
         // Handle missing fields
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
-            return response.status(400).json({ errors: errors.array() });
+            return response.status(400).json({ error: errors.array().toString() });
         }
 
         // Inserting the row into the DB, but hash password first
@@ -59,11 +62,16 @@ router.post('/signup',
             .then(async hash => {
                 request.body.password = hash
                 let user: User = await userRepository.save(request.body)
-                response.send({ id: user.id })
+                response.send({ id: user.id, message: msgSignupSuccess })
             }).catch(err => {
                 response.status(500).send({ error: `${err}` })
             })
 
     }
 )
+const msgSignupSuccess = 'Account created successfully!'
+const msgNoUserFound = "Authentication failed, no User found"
+const msgLoginSuccess = "Logged in successfully!"
+const msgWrongPassword = "Authentication failed, password do not match"
+
 export default router

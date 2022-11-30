@@ -62,7 +62,9 @@ router.post('/',
 // List
 router.get('/', (request: Request, response: Response) => {
 
-    taskRepository.find({ take: 10 })
+    taskRepository.find({
+        take: 50, relations: ['author']
+    })
         .then(tasks => response.send(tasks))
         .catch(err => {
             response.status(404).send({ error: "Could not find any tasks." })
@@ -74,7 +76,7 @@ router.get('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
         taskRepository.findOne({
-            where: { id: Number(request.params.id) }
+            where: { id: Number(request.params.id) }, relations: ['author']
         })
             .then(task => {
                 response.status(200).send(task)

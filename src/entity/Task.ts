@@ -1,7 +1,6 @@
 import {
   Column, Entity, JoinTable, ManyToMany, ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn
+  OneToMany
 } from "typeorm"
 import BaseEntity from "./BaseEntity"
 import Comment from "./Comment"
