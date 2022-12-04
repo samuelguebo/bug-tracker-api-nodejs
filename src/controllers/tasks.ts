@@ -76,7 +76,8 @@ router.get('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
         taskRepository.findOne({
-            where: { id: Number(request.params.id) }, relations: ['author']
+            where: { id: Number(request.params.id) },
+            relations: ['author', 'comments']
         })
             .then(task => {
                 response.status(200).send(task)

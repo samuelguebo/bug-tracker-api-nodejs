@@ -12,10 +12,10 @@ export default class Comment extends BaseEntity {
     @CreateDateColumn()
     createdAt: Date
 
-    @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+    @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE', eager: true })
     author: User
 
-    @ManyToOne(() => Task, { nullable: false, onDelete: 'CASCADE' })
+    @ManyToOne(() => Task, { nullable: false, onDelete: 'CASCADE', eager: true })
     task: Task
 
     @UpdateDateColumn()
