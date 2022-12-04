@@ -7,10 +7,10 @@ const router = Router()
 const commentRepository = AppDataSource.getRepository(Comment)
 
 // Create
-router.post('/',
+router.post('/:id',
     body('task').isNumeric(),
     body('author').isNumeric(),
-    body('content').isLength({ min: 10 }),
+    body('content').isLength({ min: 5 }),
     function (request: Request, response: Response,
     ) {
 
