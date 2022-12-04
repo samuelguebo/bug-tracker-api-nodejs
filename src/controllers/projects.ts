@@ -4,9 +4,11 @@ import { In } from 'typeorm'
 import { AppDataSource } from '../services/dbService'
 import Project from '../entity/Project'
 import User from '../entity/User'
+import Task from '../entity/Task'
 
 const router = Router()
 const projectRepository = AppDataSource.getRepository(Project)
+const taskRepository = AppDataSource.getRepository(Task)
 const userRepository = AppDataSource.getRepository(User)
 
 // Create
@@ -40,7 +42,8 @@ router.post('/',
         })
 
     })
-// List
+
+// Get list of projects
 router.get('/', (request: Request, response: Response) => {
 
     projectRepository.find({ take: 10 })
@@ -50,20 +53,39 @@ router.get('/', (request: Request, response: Response) => {
         })
 })
 
-// Get a single User 
+
+// Get a projects by user
+router.get('/user/:id',
+    param('id').isNumeric(),
+    function (request: Request, response: Response) {
+        /* TODO: implement this method
+            projectRepository.findOne({
+                where: { id: Number(request.params.id) },
+                select: ['id', 'description', 'title', 'members']
+            })
+                .then(project => {
+                    response.status(200).send(project)
+                }).catch(error => response.status(400).send({ error: error }))
+        */
+    }
+)
+
+// Get a project details
 router.get('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
+
         projectRepository.findOne({
             where: { id: Number(request.params.id) },
-            select: ['id', 'title', 'members']
+            relations: ['tasks', 'members'],
+            select: ['id', 'description', 'title', 'members']
         })
             .then(project => {
                 response.status(200).send(project)
             }).catch(error => response.status(400).send({ error: error }))
+
     }
 )
-
 
 // Update 
 router.put('/:id',

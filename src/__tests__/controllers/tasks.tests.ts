@@ -86,6 +86,34 @@ describe('POST /tasks', () => {
         expect(response.statusCode).toBe(400)
 
     })
+
+
+    it('should attach projects to task', async () => {
+
+        // Get mocks
+        let { project, user, task, token } = await mockEntities()
+
+        // Make HTTP request
+        let response = await request(app)
+            .post('/tasks')
+            .set({ "x-access-token": token })
+            .send({
+                author: user.id,
+                title: task.title,
+                projects: [project.id]
+            })
+        expect(response.statusCode).toBe(200)
+        expect(response.body.priority).toBe('low')
+
+        // Second HTTP request, check single route
+        response = await request(app)
+            .get(`/projects/${project.id}`)
+            .set({ "x-access-token": token })
+
+        console.log(response.body)
+        expect(response.statusCode).toBe(200)
+    })
+
 })
 
 describe('PUT /tasks/:id', () => {

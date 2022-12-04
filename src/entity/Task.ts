@@ -28,8 +28,8 @@ export default class Task extends BaseEntity {
   @Column({ default: 'low' })
   priority: Priority
 
-  @ManyToMany(() => Project)
-  @JoinTable({ name: 'task_projects' })
+  @ManyToMany(() => Project, (project) => project.tasks, { onDelete: 'NO ACTION' })
+  @JoinTable()
   projects: Project[]
 
   @OneToMany(() => Comment, comment => comment.author)
