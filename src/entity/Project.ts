@@ -22,7 +22,7 @@ export default class Project extends BaseEntity {
   @JoinTable({ name: 'project_members' })
   members: User[]
 
-  @ManyToMany(() => Task, (task) => task.projects)
+  @ManyToMany(() => Task, { onDelete: 'CASCADE' })
   @JoinTable()
   tasks: Task[]
 }

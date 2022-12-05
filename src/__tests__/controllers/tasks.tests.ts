@@ -1,11 +1,11 @@
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect } from '@jest/globals'
 import request from 'supertest'
 import app from '../../app'
 import Project from '../../entity/Project'
 import Task from '../../entity/Task'
 import User from '../../entity/User'
 import { generateJWT } from '../../services/authService'
-import { AppDataSource, initializeDatabase } from '../../services/dbService'
+import { AppDataSource } from '../../services/dbService'
 
 const userRepository = AppDataSource.getRepository(User)
 const projectRepository = AppDataSource.getRepository(Project)
@@ -110,7 +110,6 @@ describe('POST /tasks', () => {
             .get(`/projects/${project.id}`)
             .set({ "x-access-token": token })
 
-        console.log(response.body)
         expect(response.statusCode).toBe(200)
     })
 
@@ -152,4 +151,27 @@ describe('DELETE /tasks/:id', () => {
 
     })
 
+    it('should allow cascaded deletion when parent project is deleted', async () => {
+        // Get mocks
+        let { project, user, task, token } = await mockEntities()
+
+        // Make HTTP request
+        let response = await request(app)
+            .post('/tasks')
+            .set({ "x-access-token": token })
+            .send({
+                author: user.id,
+                title: task.title,
+                projects: [project.id]
+            })
+        expect(response.statusCode).toBe(200)
+        expect(response.body.priority).toBe('low')
+
+        // Second HTTP request, attemtpt deletion
+        response = await request(app)
+            .delete(`/projects/${project.id}`)
+            .set({ "x-access-token": token })
+        expect(response.statusCode).toBe(200)
+
+    })
 })

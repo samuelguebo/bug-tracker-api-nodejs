@@ -130,9 +130,12 @@ router.delete('/:id',
     function (request: Request, response: Response) {
         projectRepository.findOne({ where: { id: Number(request.params.id) } })
             .then(async project => {
-                projectRepository.delete({ id: Number(project.id) })
+                await projectRepository.delete({ id: Number(project.id) })
                 response.sendStatus(200)
-            }).catch(error => response.sendStatus(400))
+            }).catch(error => {
+                console.log(error)
+                response.sendStatus(400)
+            })
     }
 )
 

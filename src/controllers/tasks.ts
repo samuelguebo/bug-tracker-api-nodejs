@@ -77,7 +77,7 @@ router.get('/:id',
     function (request: Request, response: Response) {
         taskRepository.findOne({
             where: { id: Number(request.params.id) },
-            relations: ['author', 'comments']
+            relations: ['author', 'comments', 'projects']
         })
             .then(task => {
                 response.status(200).send(task)
@@ -137,7 +137,7 @@ router.put('/:id',
     }
 )
 
-// Delete a single Project
+// Delete a single Task
 router.delete('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {

@@ -18,7 +18,7 @@ export default class Task extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string
 
-  @ManyToOne(() => User, (user) => user, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   author: User
 
   @ManyToMany(() => User)
@@ -28,7 +28,7 @@ export default class Task extends BaseEntity {
   @Column({ default: 'low' })
   priority: Priority
 
-  @ManyToMany(() => Project, (project) => project.tasks, { onDelete: 'NO ACTION' })
+  @ManyToMany(() => Project, (project => project.tasks), { onDelete: 'CASCADE' })
   @JoinTable()
   projects: Project[]
 
