@@ -7,11 +7,11 @@ const router = Router()
 const commentRepository = AppDataSource.getRepository(Comment)
 
 // Create
-router.post('/:id',
+router.post('/',
     body('task').isNumeric(),
     body('author').isNumeric(),
     body('content').isLength({ min: 5 }),
-    function (request: Request, response: Response,
+    async function (request: Request, response: Response,
     ) {
 
         // Handle missing fields
@@ -20,8 +20,11 @@ router.post('/:id',
             return response.status(400).json({ errors: errors.array() });
         }
 
+        let comment: Comment
+        comment = { ...comment, ...request.body }
+
         // Persist to DB
-        commentRepository.save(request.body).then(comment => {
+        commentRepository.save(comment).then(comment => {
             response.send(comment)
         }).catch(err => {
             response.status(500).send({ error: `${err}` })
@@ -89,7 +92,7 @@ router.delete('/:id',
             .then(async comment => {
                 commentRepository.delete({ id: Number(comment.id) })
                 response.sendStatus(200)
-            }).catch(error => response.sendStatus(400))
+            }).catch(() => response.sendStatus(400))
     }
 )
 

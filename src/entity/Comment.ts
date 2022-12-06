@@ -15,7 +15,7 @@ export default class Comment extends BaseEntity {
     @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE', eager: true })
     author: User
 
-    @ManyToOne(() => Task, { nullable: false, onDelete: 'CASCADE', eager: true })
+    @ManyToOne(() => Task, task => task.comments, { nullable: false, onDelete: 'CASCADE', eager: true })
     task: Task
 
     @UpdateDateColumn()

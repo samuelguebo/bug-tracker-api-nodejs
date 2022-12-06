@@ -32,6 +32,6 @@ export default class Task extends BaseEntity {
   @JoinTable()
   projects: Project[]
 
-  @OneToMany(() => Comment, comment => comment.author)
+  @OneToMany(() => Comment, comment => comment.task)
   comments: Comment[]
 }
