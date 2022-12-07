@@ -5,8 +5,15 @@ import Task from "../entity/Task"
 import User from "../entity/User"
 import { DataSource } from "typeorm"
 
-export const AppDataSource = process.env.NODE_ENV === 'production'
+export const AppDataSource = process.env.NODE_ENV === 'test'
     ? new DataSource({
+        type: "sqlite",
+        database: `storage/line.sqlite`,
+        logging: process.env.TYPEORM_LOGGING as any,
+        entities: [User, Project, Task, Comment],
+        synchronize: true
+    }) :
+    new DataSource({
         type: process.env.TYPEORM_TYPE as any,
         host: process.env.TYPEORM_HOST,
         port: Number(process.env.TYPEORM_PORT),
@@ -18,14 +25,7 @@ export const AppDataSource = process.env.NODE_ENV === 'production'
         entities: [Comment, Project, Task, User],
         migrations: [],
         subscribers: [],
-    }) : new DataSource({
-        type: "sqlite",
-        database: `storage/line.sqlite`,
-        logging: process.env.TYPEORM_LOGGING as any,
-        entities: [User, Project, Task, Comment],
-        synchronize: true
     })
-
 
 // Initiate Database connection
 export const initializeDatabase = async function () {

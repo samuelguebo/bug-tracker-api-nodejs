@@ -7,7 +7,7 @@
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --setupFiles dotenv/config --watch --detectOpenHandles",
     "build:watch": "tsc --watch",
     "run:watch": "nodemon -r dotenv/config dist/server.js --watch dist",
-    "start": "NODE_ENV=production npm-run-all --parallel build:watch run:watch",
+    "start": "NODE_ENV=development npm-run-all --parallel build:watch run:watch",
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "author": "Samuel Guebo",
@@ -48,6 +48,7 @@
     "supertest": "^6.3.1",
     "ts-jest": "^29.0.3",
     "ts-node": "10.7.0",
-    "typescript": "4.5.2"
+    "typescript": "4.5.2",
+    "sqlite3": "^5.1.2"
   }
 }

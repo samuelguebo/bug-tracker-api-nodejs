@@ -28,7 +28,7 @@ export default class Task extends BaseEntity {
   @Column({ default: 'low' })
   priority: Priority
 
-  @ManyToMany(() => Project, (project => project.tasks), { onDelete: 'CASCADE' })
+  @ManyToMany(() => Project, project => project.tasks, { onDelete: 'CASCADE' })
   @JoinTable()
   projects: Project[]
 
