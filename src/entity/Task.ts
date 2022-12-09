@@ -18,6 +18,12 @@ export default class Task extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string
 
+  @Column({ nullable: true })
+  startDate: Date
+
+  @Column({ nullable: true })
+  endDate: Date
+
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   author: User
 
