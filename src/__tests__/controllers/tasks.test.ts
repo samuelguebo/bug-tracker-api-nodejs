@@ -105,38 +105,122 @@ describe('POST /tasks', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.priority).toBe('low')
 
-        // Second HTTP request, check single route
+        // Check whether task endpoint displays added project
+        response = await request(app)
+            .get(`/tasks/${response.body.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.projects?.length).toBe(1)
+
+        // Check whether project endpoint displays added task
         response = await request(app)
             .get(`/projects/${project.id}`)
             .set({ "x-access-token": token })
 
         expect(response.statusCode).toBe(200)
+        expect(response.body.tasks?.length).toBe(1)
     })
 
+    it('should attach collaborators to task', async () => {
+
+        // Get mocks
+        let { user, task, token } = await mockEntities()
+
+        // Make HTTP request
+        let response = await request(app)
+            .post('/tasks')
+            .set({ "x-access-token": token })
+            .send({
+                author: user.id,
+                title: task.title,
+                collaborators: [user.id]
+            })
+        expect(response.statusCode).toBe(200)
+        expect(response.body.priority).toBe('low')
+
+        // Check whether task endpoint displays added collaborator
+        response = await request(app)
+            .get(`/tasks/${response.body.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.collaborators.length).toBe(1)
+
+    })
 })
 
 describe('PUT /tasks/:id', () => {
     it('should allow the update of task and return an ID', async () => {
 
         // Get mocks
-        const { task, user, token } = await mockEntities()
+        const { task, user, project, token } = await mockEntities()
 
         // Make HTTP query
-        const response = await request(app)
+        let response = await request(app)
             .put(`/tasks/${task.id}`)
             .set({ "x-access-token": token })
             .send({
                 author: user.id,
-                title: 'An update is usually a good thing!'
+                title: 'An update is usually a good thing!',
+                projects: [project.id],
+                collaborators: [user.id],
             })
 
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
 
-        let updatedTask = await taskRepository
-            .findOne({ where: { id: task.id } })
-        expect(updatedTask.title).toBe('An update is usually a good thing!')
+        // Check whether task endpoint displays added project
+        response = await request(app)
+            .get(`/tasks/${response.body.id}`)
+            .set({ "x-access-token": token })
 
+        expect(response.statusCode).toBe(200)
+        expect(response.body.projects?.length).toBe(1)
+
+        // Check whether project endpoint displays added task
+        response = await request(app)
+            .get(`/projects/${project.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.tasks?.length).toBe(1)
+    })
+
+    it('should update task if we attach collaborators and projects ', async () => {
+
+        // Get mocks
+        const { task, user, project, token } = await mockEntities()
+
+        // Make HTTP query
+        let response = await request(app)
+            .put(`/tasks/${task.id}`)
+            .set({ "x-access-token": token })
+            .send({
+                author: user.id,
+                title: 'An update is usually a good thing!',
+                projects: [project.id],
+                collaborators: [user.id],
+            })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.id).toBeGreaterThan(0)
+
+        // Check whether task endpoint displays added project
+        response = await request(app)
+            .get(`/tasks/${response.body.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.projects?.length).toBe(1)
+
+        // Check whether project endpoint displays added task
+        response = await request(app)
+            .get(`/projects/${project.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.tasks?.length).toBe(1)
     })
 
 })

@@ -27,9 +27,9 @@ export default class Task extends BaseEntity {
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   author: User
 
-  @ManyToMany(() => User)
-  @JoinTable({ name: 'task_subscribers' })
-  subscribers: User[]
+  @ManyToMany(() => User, user => user.tasks)
+  @JoinTable()
+  collaborators: User[]
 
   @Column({ default: 'low' })
   priority: Priority

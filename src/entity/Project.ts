@@ -18,8 +18,8 @@ export default class Project extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @ManyToMany(() => User)
-  @JoinTable({ name: 'project_members' })
+  @ManyToMany(() => User, user => user.projects)
+  @JoinTable()
   members: User[]
 
   @ManyToMany(() => Task, { onDelete: 'CASCADE' })

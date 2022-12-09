@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm"
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm"
 import BaseEntity from "./BaseEntity"
 import Comment from "./Comment"
+import Project from "./Project"
 import Task from "./Task"
 
 @Entity()
@@ -21,8 +22,11 @@ export default class User extends BaseEntity {
   @Column({ select: false })
   password: string
 
-  @OneToMany(() => Task, task => task.author)
+  @ManyToMany(() => Task, task => task.collaborators)
   tasks: Task[]
+
+  @ManyToMany(() => Project, project => project.members)
+  projects: Project[]
 
   @OneToMany(() => Comment, comment => comment.author)
   comments: Comment[]

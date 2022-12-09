@@ -8,7 +8,6 @@ import Task from '../entity/Task'
 
 const router = Router()
 const projectRepository = AppDataSource.getRepository(Project)
-const taskRepository = AppDataSource.getRepository(Task)
 const userRepository = AppDataSource.getRepository(User)
 
 // Create
@@ -35,8 +34,8 @@ router.post('/',
         }
 
         // Persist and return entity
-        projectRepository.save(project).then(project => {
-            response.send(project)
+        projectRepository.save(project).then(new_project => {
+            response.send(new_project)
         }).catch(err => {
             response.status(500).send({ error: `${err}` })
         })
@@ -48,7 +47,7 @@ router.get('/', (request: Request, response: Response) => {
 
     projectRepository.find({ take: 10 })
         .then(projects => response.send(projects))
-        .catch(err => {
+        .catch(() => {
             response.status(404).send({ error: "Could not find any projects." })
         })
 })
@@ -58,15 +57,14 @@ router.get('/', (request: Request, response: Response) => {
 router.get('/user/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
-        /* TODO: implement this method
-            projectRepository.findOne({
-                where: { id: Number(request.params.id) },
-                select: ['id', 'description', 'title', 'members']
-            })
-                .then(project => {
-                    response.status(200).send(project)
-                }).catch(error => response.status(400).send({ error: error }))
-        */
+        userRepository.findOne({
+            where: { id: Number(request.params.id) },
+            relations: ['projects'],
+            select: ['id', 'projects']
+        })
+            .then(project => {
+                response.status(200).send(project)
+            }).catch(error => response.status(400).send({ error: error }))
     }
 )
 
@@ -91,7 +89,7 @@ router.get('/:id',
 router.put('/:id',
     param('id').isNumeric(),
     body('title').isLength({ min: 5 }),
-    body('members').optional(),
+    body('members').optional().isArray(),
     async (request: Request, response: Response) => {
 
         // Handle missing fields
@@ -114,9 +112,10 @@ router.put('/:id',
                     where: { id: In(request.body.members) }
                 })
             }
+
             // Persist and return entity
-            project = await projectRepository.save(project)
-            response.send(project)
+            const new_project = await projectRepository.save(project)
+            response.send(new_project)
         }).catch(err => {
             response.status(500).send({ error: `${err}` })
         })

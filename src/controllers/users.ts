@@ -10,8 +10,10 @@ const userRepository = AppDataSource.getRepository(User)
 // Get All
 router.get('/', function (request: Request, response: Response) {
 
-    userRepository.find({ take: 5 }).then(users => {
-        response.status(200).send(users.map(user => user.id))
+    userRepository.find({
+        take: 10, select: ['id', 'firstName', 'email']
+    }).then(users => {
+        response.status(200).send(users)
     }).catch(error => {
         console.log(error)
     })
@@ -43,8 +45,8 @@ router.put('/:id',
                 // Update record
                 user = await userRepository.preload(user)
                 user = { ...user, ...request.body }
-                user = await userRepository.save(user)
-                response.status(200).send(user)
+                const new_user = await userRepository.save(user)
+                response.status(200).send(new_user)
             }).catch(error => response.status(400).send({ error: error }))
 
     }

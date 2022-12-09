@@ -15,7 +15,7 @@ const projectRepository = AppDataSource.getRepository(Project)
 router.post('/',
     body('title').isLength({ min: 5 }),
     body('author').isNumeric(),
-    body('subscribers').optional().isArray(),
+    body('collaborators').optional().isArray(),
     body('priority').optional().isIn(['low', 'medium', 'high']),
     body('projects').optional().isArray(),
     async (request: Request, response: Response) => {
@@ -35,10 +35,10 @@ router.post('/',
             where: { id: Number(request.body.author) }
         })
 
-        // Attach subscribers, if applicable
-        if (request.body.subscribers !== undefined) {
-            task.subscribers = await userRepository.find({
-                where: { id: In(request.body.subscribers) }
+        // Attach collaborators, if applicable
+        if (request.body.collaborators !== undefined) {
+            task.collaborators = await userRepository.find({
+                where: { id: In(request.body.collaborators) }
             })
         }
 
@@ -50,10 +50,10 @@ router.post('/',
         }
 
         // Persist and return created Task
-        taskRepository.save(task).then(task => {
-            response.send(task)
+        taskRepository.save(task).then(new_task => {
+            response.send(new_task)
         }).catch(err => {
-            response.status(500).send({ error: `Could not create the user ${err}` })
+            response.status(500).send({ error: `${err}` })
         })
 
     }
@@ -77,10 +77,10 @@ router.get('/:id',
     function (request: Request, response: Response) {
         taskRepository.findOne({
             where: { id: Number(request.params.id) },
-            relations: ['author', 'comments', 'projects']
+            relations: ['author', 'comments', 'projects', 'collaborators']
         })
-            .then(task => {
-                response.status(200).send(task)
+            .then(new_task => {
+                response.status(200).send(new_task)
             }).catch(error => response.status(400).send({ error: error }))
     })
 
@@ -90,7 +90,7 @@ router.put('/:id',
     param('id').isNumeric(),
     body('title').isLength({ min: 5 }),
     body('author').isNumeric(),
-    body('subscribers').optional().isArray(),
+    body('collaborators').optional().isArray(),
     body('priority').optional().isIn(['low', 'medium', 'high']),
     body('projects').optional().isArray(),
     async (request: Request, response: Response) => {
@@ -113,10 +113,10 @@ router.put('/:id',
                     where: { id: Number(request.body.author) }
                 })
 
-                // Attach subscribers, if applicable
-                if (request.body.subscribers !== undefined) {
-                    task.subscribers = await userRepository.find({
-                        where: { id: In(request.body.subscribers) }
+                // Attach collaborators, if applicable
+                if (request.body.collaborators !== undefined) {
+                    task.collaborators = await userRepository.find({
+                        where: { id: In(request.body.collaborators) }
                     })
                 }
 
@@ -128,8 +128,8 @@ router.put('/:id',
                 }
 
                 // Persist and return created entity
-                task = await taskRepository.save(task)
-                response.send(task)
+                const new_task = await taskRepository.save(task)
+                response.send(new_task)
             }).catch(err => {
                 response.status(500).send({ error: `${err}` })
             })

@@ -83,9 +83,10 @@ describe('POST /projects', () => {
 
     it('should attach users to projects as members', async () => {
 
-        const { userIds, token } = await mockEntities()
+        const { userIds, token, project } = await mockEntities()
         const payLoad = { title: 'Compliance audit', members: userIds }
-        const response = await request(app)
+
+        let response = await request(app)
             .post("/projects")
             .set({ "x-access-token": token })
             .send(payLoad)
@@ -93,6 +94,14 @@ describe('POST /projects', () => {
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
         expect(response.body.id).toBeGreaterThan(0)
+
+        // Check whether project endpoint displays added task
+        response = await request(app)
+            .get(`/projects/${response.body.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.members.length).toBe(userIds.length)
 
     })
 
@@ -110,20 +119,14 @@ describe('POST /projects', () => {
 
 describe('PUT /projects/:id', () => {
     it('should update Project and return an ID', async () => {
-        const { project, token } = await mockEntities()
+        const { project, token, userIds } = await mockEntities()
 
-        const response = await request(app)
+        let response = await request(app)
             .put(`/projects/${project.id}`)
             .set({ "x-access-token": token })
             .send({ title: 'Org-wide Holidays' })
         expect(response.statusCode).toBe(200)
         expect(response.body.id).toBeGreaterThan(0)
-
-        let updatedProject = await projectRepository.findOne(
-            {
-                where: { id: project.id }
-            })
-        expect(updatedProject?.title).toBe('Org-wide Holidays')
 
     })
 
@@ -133,7 +136,7 @@ describe('PUT /projects/:id', () => {
 
         // Update Project
         const payLoad = { title: 'Compliance audit', members: userIds }
-        const response = await request(app)
+        let response = await request(app)
             .put(`/projects/${project.id}`)
             .set({ "x-access-token": token })
             .send(payLoad)
@@ -141,7 +144,14 @@ describe('PUT /projects/:id', () => {
         // Check API response and value of updated Project
         expect(response.statusCode).toBe(200)
         expect(response.headers['content-type']).toContain('json')
-        expect(response.body.members).toHaveLength(userIds.length)
+
+        // Check whether project endpoint displays added task
+        response = await request(app)
+            .get(`/projects/${project.id}`)
+            .set({ "x-access-token": token })
+
+        expect(response.statusCode).toBe(200)
+        expect(response.body.members.length).toBe(userIds.length)
 
     })
 })
