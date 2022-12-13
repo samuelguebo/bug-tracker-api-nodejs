@@ -45,7 +45,7 @@ router.post('/',
 // Get list of projects
 router.get('/', (request: Request, response: Response) => {
 
-    projectRepository.find({ take: 10 })
+    projectRepository.find({ relations: ['members'] })
         .then(projects => response.send(projects))
         .catch(() => {
             response.status(404).send({ error: "Could not find any projects." })
