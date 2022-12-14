@@ -56,9 +56,12 @@ router.put('/:id',
 router.get('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
-        userRepository.findOne({ where: { id: Number(request.params.id) } })
+        userRepository.findOne({
+            where: { id: Number(request.params.id) },
+            select: ['id', 'email', 'firstName', 'lastName']
+        })
             .then(async user => {
-                response.status(200).send({ id: user.id, email: user.email, })
+                response.status(200).send(user)
             }).catch(error => response.status(400).send({ error: error }))
     })
 
