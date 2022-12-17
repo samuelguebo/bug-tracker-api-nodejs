@@ -10,9 +10,7 @@ const userRepository = AppDataSource.getRepository(User)
 // Get All
 router.get('/', function (request: Request, response: Response) {
 
-    userRepository.find({
-        take: 10, select: ['id', 'firstName', 'email']
-    }).then(users => {
+    userRepository.find({ take: 10 }).then(users => {
         response.status(200).send(users)
     }).catch(error => {
         console.log(error)
@@ -23,6 +21,7 @@ router.get('/', function (request: Request, response: Response) {
 // Get single user 
 router.put('/:id',
     param('id').isNumeric(),
+    param('avatar').optional().isNumeric(),
     body('email').optional().isEmail(),
     body('password').optional().isLength({ min: 6 }),
     function (request: Request, response: Response) {
@@ -33,8 +32,7 @@ router.put('/:id',
         }
 
         userRepository.findOne({
-            where: { id: Number(request.params.id) },
-            select: ['id', 'email', 'firstName', 'lastName']
+            where: { id: Number(request.params.id) }
         })
             .then(async user => {
                 // Handle password change
@@ -45,8 +43,8 @@ router.put('/:id',
                 // Update record
                 user = await userRepository.preload(user)
                 user = { ...user, ...request.body }
-                const new_user = await userRepository.save(user)
-                response.status(200).send(new_user)
+                user = await userRepository.save(user)
+                response.status(200).send(user)
             }).catch(error => response.status(400).send({ error: error }))
 
     }
@@ -57,8 +55,7 @@ router.get('/:id',
     param('id').isNumeric(),
     function (request: Request, response: Response) {
         userRepository.findOne({
-            where: { id: Number(request.params.id) },
-            select: ['id', 'email', 'firstName', 'lastName']
+            where: { id: Number(request.params.id) }
         })
             .then(async user => {
                 response.status(200).send(user)
