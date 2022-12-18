@@ -24,6 +24,7 @@ router.put('/:id',
     param('avatar').optional().isNumeric(),
     body('email').optional().isEmail(),
     body('password').optional().isLength({ min: 6 }),
+    body('role').optional().isIn(['admin', 'member']),
     function (request: Request, response: Response) {
         // Handle missing fields
         const errors = validationResult(request);
@@ -31,10 +32,16 @@ router.put('/:id',
             return response.status(400).json({ errors: errors.array() });
         }
 
+
         userRepository.findOne({
             where: { id: Number(request.params.id) }
         })
             .then(async user => {
+                // Restrict update capabilities for member
+                if (request.body?.performer?.role !== 'admin') {
+                    request.body.role = user?.role
+                }
+
                 // Handle password change
                 if (request.body.password !== undefined) {
                     let hash = await utils.hashPassword(request.body.password)
@@ -42,9 +49,14 @@ router.put('/:id',
                 }
                 // Update record
                 user = await userRepository.preload(user)
-                user = { ...user, ...request.body }
-                user = await userRepository.save(user)
-                response.status(200).send(user)
+                user = await userRepository.save({ ...user, ...request.body })
+                response.status(200).send({
+                    id: user?.id,
+                    firstName: user?.firstName,
+                    email: user?.email,
+                    role: user?.role,
+                    avatar: user?.avatar
+                })
             }).catch(error => response.status(400).send({ error: error }))
 
     }
@@ -68,7 +80,7 @@ router.delete('/:id',
     function (request: Request, response: Response) {
         userRepository.findOne({ where: { id: Number(request.params.id) } })
             .then(async user => {
-                userRepository.delete({ id: Number(user.id) })
+                userRepository.delete({ id: Number(user?.id) })
                 response.sendStatus(200)
             }).catch(error => response.sendStatus(400))
     }

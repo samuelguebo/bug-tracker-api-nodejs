@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6"],
+    "lib": [
+      "es5",
+      "es6"
+    ],
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -10,8 +13,10 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": false,
+    "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts"
+  ]
 }

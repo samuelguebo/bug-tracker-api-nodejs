@@ -27,6 +27,8 @@ const authenticateJWT = async (request: Request, response: Response, next: NextF
         if (!isAuthorized)
             return response.status(403).send({ error: "Resource not allowed." })
 
+        // Attach request's identity to Request object
+        request.body["performer"] = user
     } catch (err) {
         return response.status(401).send({ error: "Invalid Token" })
     }

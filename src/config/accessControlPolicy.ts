@@ -11,7 +11,7 @@ export const accessControlPolicy: Policy = {
         resources: ["*"]
     },
     member: {
-        actions: ['GET', 'POST'],
+        actions: ['GET', 'POST', 'PUT'],
         resources: ["users", "projects", "tasks", "comments"]
     },
     guest: {

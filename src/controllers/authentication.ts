@@ -12,10 +12,10 @@ const userRepository: Repository<User> = AppDataSource.getRepository(User)
 // Authentication
 router.post('/login', async function (request, response) {
     try {
-        const user: User = await userRepository.findOne(
+        const user = await userRepository.findOne(
             {
                 where: { email: request.body.email },
-                select: ['id', 'password', 'role', 'email', 'firstName']
+                select: ['id', 'password', 'role', 'email', 'firstName', 'avatar']
             })
 
         if (!user) {
@@ -37,7 +37,8 @@ router.post('/login', async function (request, response) {
             role: user.role,
             firstName: user.firstName,
             message: msgLoginSuccess,
-            id: user.id
+            id: user.id,
+            avatar: user.avatar
         })
     } catch (error) {
         response.status(500).send(error)
