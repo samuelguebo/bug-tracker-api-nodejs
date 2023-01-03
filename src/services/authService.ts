@@ -17,15 +17,21 @@ const authenticateJWT = async (request: Request, response: Response, next: NextF
     }
     try {
         const { verify } = jsonwebtoken
-        const decoded: {} = verify(token, process.env.AUTH_SECRET)
+        const secret: string = String(process.env.AUTH_SECRET)
+        const decoded: any = verify(token, secret)
 
         // Apply Attribute-Based Access Control
-        let user: User = await AppDataSource.getRepository(User)
+        let user = await AppDataSource.getRepository(User)
             .findOne({ where: { id: decoded["userId"] } })
 
-        const isAuthorized = verifyUserAuthorization(user, request)
-        if (!isAuthorized)
+        if (!user) {
             return response.status(403).send({ error: "Resource not allowed." })
+        }
+
+        const isAuthorized = verifyUserAuthorization(user, request)
+        if (!isAuthorized) {
+            return response.status(403).send({ error: "Resource not allowed." })
+        }
 
         // Attach request's identity to Request object
         request.body["performer"] = user
@@ -36,7 +42,7 @@ const authenticateJWT = async (request: Request, response: Response, next: NextF
     return next()
 }
 
-export const generateJWT = (user: User) => sign({ userId: user.id }, process.env.AUTH_SECRET, {
+export const generateJWT = (user: User) => sign({ userId: user.id }, String(process.env.AUTH_SECRET), {
     expiresIn: 24 * 60 * 60  // expires in 24 hours
 })
 
