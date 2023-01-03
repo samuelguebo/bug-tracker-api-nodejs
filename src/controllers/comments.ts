@@ -20,7 +20,7 @@ router.post('/',
             return response.status(400).json({ errors: errors.array() });
         }
 
-        let comment: Comment
+        let comment: Comment = new Comment
         comment = { ...comment, ...request.body }
 
         // Persist to DB
@@ -74,10 +74,11 @@ router.put('/:id',
         })
             .then(async comment => {
 
+                if (!comment)
+                    throw Error("Comment does not exist.")
                 // Update record
-                comment = await commentRepository.preload(comment)
-                comment = { ...comment, ...request.body }
-                comment = await commentRepository.save(comment)
+                const existingComment = await commentRepository.preload(comment)
+                comment = await commentRepository.save({ ...existingComment, ...request.body })
                 response.status(200).send(comment)
             }).catch(error => response.status(400).send({ error: error }))
 
@@ -90,7 +91,7 @@ router.delete('/:id',
     function (request: Request, response: Response) {
         commentRepository.findOne({ where: { id: Number(request.params.id) } })
             .then(async comment => {
-                commentRepository.delete({ id: Number(comment.id) })
+                commentRepository.delete({ id: Number(comment?.id) })
                 response.sendStatus(200)
             }).catch(() => response.sendStatus(400))
     }

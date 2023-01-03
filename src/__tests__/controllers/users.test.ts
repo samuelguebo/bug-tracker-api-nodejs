@@ -61,7 +61,7 @@ describe('PUT /users/:id', () => {
         expect(response.body.id).toBeGreaterThan(0)
 
         let updatedUser = await userRepository.findOne({ where: { id: user.id } })
-        expect(updatedUser.firstName).toBe('Cecile')
+        expect(updatedUser?.firstName).toBe('Cecile')
 
     })
 

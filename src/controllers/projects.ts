@@ -4,7 +4,6 @@ import { In } from 'typeorm'
 import { AppDataSource } from '../services/dbService'
 import Project from '../entity/Project'
 import User from '../entity/User'
-import Task from '../entity/Task'
 
 const router = Router()
 const projectRepository = AppDataSource.getRepository(Project)
@@ -23,7 +22,7 @@ router.post('/',
         }
 
         // Attach basic fields
-        let project: Project
+        let project: Project = new Project
         project = { ...project, ...request.body }
 
         // Attach members, if applicable
@@ -102,19 +101,22 @@ router.put('/:id',
             where: { id: Number(request.params.id) }
         }).then(async project => {
 
+            if (!project) {
+                throw Error("Project does not exist.")
+            }
+
             // Update basic fields
-            project = await projectRepository.preload(project)
-            project = { ...project, ...request.body }
+            const existingProject = await projectRepository.preload(project)
 
             // Update members, if applicable
             if (request.body.members !== undefined) {
-                project.members = await userRepository.find({
+                request.body.members = await userRepository.find({
                     where: { id: In(request.body.members) }
                 })
             }
 
             // Persist and return entity
-            const new_project = await projectRepository.save(project)
+            const new_project = await projectRepository.save({ ...existingProject, ...request.body })
             response.send(new_project)
         }).catch(err => {
             response.status(500).send({ error: `${err}` })
@@ -129,7 +131,7 @@ router.delete('/:id',
     function (request: Request, response: Response) {
         projectRepository.findOne({ where: { id: Number(request.params.id) } })
             .then(async project => {
-                await projectRepository.delete({ id: Number(project.id) })
+                await projectRepository.delete({ id: Number(project?.id) })
                 response.sendStatus(200)
             }).catch(error => {
                 console.log(error)

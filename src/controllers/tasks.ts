@@ -27,13 +27,17 @@ router.post('/',
         }
 
         // Attach basic fields
-        let task: Task
+        let task: Task = new Task
         task = { ...task, ...request.body }
 
         // Attach author
-        task.author = await userRepository.findOne({
+        const existingAuthor = await userRepository.findOne({
             where: { id: Number(request.body.author) }
         })
+
+        if (existingAuthor) {
+            task.author = existingAuthor
+        }
 
         // Attach collaborators, if applicable
         if (request.body.collaborators !== undefined) {
@@ -101,38 +105,46 @@ router.put('/:id',
             return response.status(400).json({ errors: errors.array() });
         }
 
-        taskRepository.findOne({ where: { id: Number(request.params.id) } })
-            .then(async task => {
+        try {
+            let task = await taskRepository.findOne({ where: { id: Number(request.params.id) } })
 
-                // Attach basic fields
-                task = await taskRepository.preload(task)
-                task = { ...task, ...request.body }
+            if (!task) {
+                throw Error("User does not exist")
+            }
+            // Attach basic fields
+            let existingTask = await taskRepository.preload(task)
+            existingTask = { ...existingTask, ...request.body }
 
-                // Attach author
-                task.author = await userRepository.findOne({
-                    where: { id: Number(request.body.author) }
-                })
-
-                // Attach collaborators, if applicable
-                if (request.body.collaborators !== undefined) {
-                    task.collaborators = await userRepository.find({
-                        where: { id: In(request.body.collaborators) }
-                    })
-                }
-
-                // Attach projects, if applicable
-                if (request.body.projects !== undefined) {
-                    task.projects = await projectRepository.find({
-                        where: { id: In(request.body.projects) }
-                    })
-                }
-
-                // Persist and return created entity
-                const new_task = await taskRepository.save(task)
-                response.send(new_task)
-            }).catch(err => {
-                response.status(500).send({ error: `${err}` })
+            // Attach author
+            const existingAuthor = await userRepository.findOne({
+                where: { id: Number(request.body.author) }
             })
+
+            if (existingAuthor) {
+                task.author = existingAuthor
+            }
+
+            // Attach collaborators, if applicable
+            if (request.body.collaborators !== undefined) {
+                task.collaborators = await userRepository.find({
+                    where: { id: In(request.body.collaborators) }
+                })
+            }
+
+            // Attach projects, if applicable
+            if (request.body.projects !== undefined) {
+                task.projects = await projectRepository.find({
+                    where: { id: In(request.body.projects) }
+                })
+            }
+
+            // Persist and return created entity
+            const new_task = await taskRepository.save(task)
+            response.send(new_task)
+        }
+        catch (error) {
+            response.status(400).send({ error: error })
+        }
 
     }
 )
@@ -143,7 +155,7 @@ router.delete('/:id',
     function (request: Request, response: Response) {
         taskRepository.findOne({ where: { id: Number(request.params.id) } })
             .then(async task => {
-                taskRepository.delete({ id: Number(task.id) })
+                taskRepository.delete({ id: Number(task?.id) })
                 response.sendStatus(200)
             }).catch(error => response.sendStatus(400))
     })

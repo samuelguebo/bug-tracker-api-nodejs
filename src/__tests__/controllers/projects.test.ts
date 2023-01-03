@@ -21,9 +21,9 @@ afterEach(async () => {
 })
 
 const mockEntities = async () => {
-    let project: Project
-    let user: User
-    let task: Task
+    let project: Project = new Project
+    let user: User = new User
+    let task: Task = new Task
     let token: string
     let users: User[] = []
     let userIds: number[] = []

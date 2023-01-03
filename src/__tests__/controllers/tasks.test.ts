@@ -12,9 +12,9 @@ const projectRepository = AppDataSource.getRepository(Project)
 const taskRepository = AppDataSource.getRepository(Task)
 
 const mockEntities = async () => {
-    let project: Project
-    let user: User
-    let task: Task
+    let project: Project = new Project
+    let user: User = new User
+    let task: Task = new Task
     let token: string
 
     project = await projectRepository.save({ ...project, title: 'December holidays' })

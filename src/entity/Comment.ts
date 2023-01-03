@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm"
 import BaseEntity from "./BaseEntity"
 import Task from "./Task"
 import User from "./User"

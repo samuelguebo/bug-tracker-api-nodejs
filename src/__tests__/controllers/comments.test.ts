@@ -15,10 +15,10 @@ const taskRepository = AppDataSource.getRepository(Task)
 
 const mockEntities = async () => {
 
-    let project: Project
-    let user: User
-    let comment: Comment
-    let task: Task
+    let project: Project = new Project
+    let user: User = new User
+    let comment: Comment = new Comment
+    let task: Task = new Task
 
     project = await projectRepository.save({ ...project, title: 'December holidays' })
     user = await userRepository.save({ ...user, email: 'anna@doe.com', password: 'anna@doe.com', role: "admin" })
@@ -53,7 +53,7 @@ describe('GET /comments', () => {
 
     it('should display details of single Comment', async () => {
 
-        const { project, user, task, comment } = await mockEntities()
+        const { user, comment } = await mockEntities()
 
         const response = await request(app)
             .get(`/comments/${comment.id}`)
@@ -68,7 +68,7 @@ describe('GET /comments', () => {
 describe('POST /comments', () => {
     it('should allow the creation of comment and return entity', async () => {
         // Get mocks
-        const { project, user, task, comment } = await mockEntities()
+        const { user, comment } = await mockEntities()
 
         // Make HTTP request
         const response = await request(app)
@@ -86,15 +86,8 @@ describe('POST /comments', () => {
     })
 
     it('should not allow comment creation when task ID is missing', async () => {
-        const { project, user, task, comment } = await mockEntities()
+        const { user, comment } = await mockEntities()
 
-        const response = await request(app)
-            .post('/comments')
-            .set({ "x-access-token": generateJWT(user) })
-            .send({
-                author: comment.author.id,
-                content: comment.content
-            })
 
     })
 })
@@ -104,7 +97,7 @@ describe('PUT /comments/:id', () => {
     it('should allow the update of comment and return an ID', async () => {
 
         // Get mocks
-        const { task, project, user, comment } = await mockEntities()
+        const { user, comment } = await mockEntities()
 
         // Make HTTP query
         const response = await request(app)
@@ -124,14 +117,14 @@ describe('PUT /comments/:id', () => {
                 {
                     where: { id: comment.id }
                 })
-        expect(updatedComment.content).toBe('An update is usually a good thing!')
+        expect(updatedComment?.content).toBe('An update is usually a good thing!')
     })
 
 })
 
 describe('DELETE /comments/:id', () => {
     it('should allow the deletion of comment and return 200', async () => {
-        const { project, user, task, comment } = await mockEntities()
+        const { user, comment } = await mockEntities()
 
         const response = await request(app)
             .delete(`/comments/${comment.id}`)
