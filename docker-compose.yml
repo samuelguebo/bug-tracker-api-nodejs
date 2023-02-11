@@ -25,7 +25,7 @@ services:
     depends_on:
       - bugtracker_mysql
     ports:
-      - 5000:5000
+      - 4968:4968
   bugtracker_phpmyadmin:
     image: phpmyadmin
     restart: always

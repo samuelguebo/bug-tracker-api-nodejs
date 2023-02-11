@@ -1,6 +1,7 @@
 node_modules/
 storage/
 .env
+.idea
 ormconfig.env
 dist/
 .DS_Store

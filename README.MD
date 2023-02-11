@@ -14,7 +14,7 @@ The Docker container includes the Node.js and the MySQL servers. Start the serve
 
 `docker compose up -d` 
 
-A web server will be setup, available at http://localhost:5000. Change to TypeScript files will trigger an automatic reload of the server, and your modifications will imediatelly be taken into account. One database named `bugtracker_db` is also created in the MySQL server. Please note that the server may take a moment to install dependencies and start.
+A web server will be setup, available at http://localhost:4968. Change to TypeScript files will trigger an automatic reload of the server, and your modifications will imediatelly be taken into account. One database named `bugtracker_db` is also created in the MySQL server. Please note that the server may take a moment to install dependencies and start.
 
 ### Stop Docker container
 To stop, run `docker-compose stop` or hit CTRL-C on the terminal your docker-compose is running in.
