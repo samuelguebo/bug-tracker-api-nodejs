@@ -28,7 +28,7 @@
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
     "sqlite3": "^5.1.2",
-    "typeorm": "^0.3.10",
+    "typeorm": "^0.3.5",
     "typeorm-extension": "^2.2.13"
   },
   "devDependencies": {

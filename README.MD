@@ -28,12 +28,17 @@ Logs of containerized servers are captured and available in [Docker logs](https:
 
 ## Features
 ### Initial data seed
-On first run the app is populated with some initial data: tasks, users, projects, comments.
+On first run, the app is populated with initial data: tasks, users, projects, comments. See `init.sql` SQL dump for more details. The initial accounts are as follows:
+
+|Username       | Password       | Role  |
+|:--------------|:---------------|:------|
+|marie@rose.com | marie@rose.com | admin |
+|anna@brown.com | anna@brown.com | member|
+|samuel@doe.com | samuel@doe.com | member|
 
 ### Restful API
 An api with the following routes
-* `/signup`
-`/login`
+* `/signup` and `/login`.
 * `/tasks`
 * `/projects`
 * `/users`
