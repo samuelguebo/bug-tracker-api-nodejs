@@ -24,7 +24,7 @@
     "first-run": "^3.0.0",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.19.2",
-    "mysql2": "^2.3.3",
+    "mysql2": "^3.9.4",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
     "sqlite3": "^5.1.5",
